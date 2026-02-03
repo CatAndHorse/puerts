@@ -116,7 +116,6 @@ else ()
         Src/JSFunction.cpp
         ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
         Src/pesapi_wrap.c
-        Src/VS2017Compat.cpp
     )
 endif()
 
@@ -417,34 +416,6 @@ if ( WITH_WEBSOCKET EQUAL 2 )
     endif ()
 
     FetchContent_MakeAvailable(wolfssl)
-
-    include(FetchContent)
-
-    FetchContent_Declare(
-        wolfssl
-        GIT_REPOSITORY https://github.com/wolfSSL/wolfssl.git
-        GIT_TAG        v5.7.2-stable 
-    )
-    set(WOLFSSL_EXAMPLES  OFF)
-    set(WOLFSSL_CRYPT_TESTS OFF)
-    set(BUILD_SHARED_LIBS OFF)
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    
-    if ( APPLE )
-        if ( IOS )
-            set(WOLFSSL_SYS_CA_CERTS OFF)
-        else ()
-            if ( NOT DEFINED FOR_SILICON )
-                set(CMAKE_SYSTEM_PROCESSOR x86_64)
-            else ()
-                set(CMAKE_SYSTEM_PROCESSOR arm64)
-            endif ()
-        endif ()
-    elseif ( OHOS )
-        set(WARNING_C_FLAGS "-Wall -Wextra -Wno-unused")
-    endif ()
-
-    FetchContent_MakeAvailable(wolfssl)
     
     target_compile_definitions(wolfssl PUBLIC WOLFSSL_OPENSSLEXTRA WOLFSSL_OPENSSLALL OPENSSL_EXTRA OPENSSL_ALL HAVE_EX_DATA WOLFSSL_OPENSSH)
     
@@ -458,6 +429,15 @@ if ( WITH_WEBSOCKET EQUAL 2 )
 	    set_property(TARGET wolfssl PROPERTY
              MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     endif ()
+
+    get_target_property(target_type puerts TYPE)
+    if (target_type STREQUAL "STATIC_LIBRARY" AND NOT BUILD_SHARED_LIBS)
+        add_custom_command(TARGET puerts POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:wolfssl>"
+            "$<TARGET_FILE_DIR:puerts>/$<TARGET_FILE_NAME:wolfssl>"
+            COMMENT "copy wolfssl to output directory")
+    endif()
 endif ()
 
 if ( USING_MULT_BACKEND )
@@ -690,11 +670,6 @@ endif()
 target_link_libraries(puerts
     ${BACKEND_LIB_NAMES}
 )
-
-# Add linker flag for VS 2017 compatibility with newer V8 libraries
-if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-    set_target_properties(puerts PROPERTIES LINK_FLAGS "/d2:-noAsyncCtorGuard")
-endif()
 list(APPEND PUERTS_COMPILE_DEFINITIONS ${BACKEND_DEFINITIONS})
 
 target_compile_definitions (puerts PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
@@ -714,20 +689,23 @@ if( USING_MULT_BACKEND )
     if ( USING_V8)
         target_compile_definitions (v8backend PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
         if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-            set_property(TARGET v8backend PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+            set_property(TARGET v8backend PROPERTY
+                     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         endif ()
     endif ()
-    
+
     if ( USING_QJS)
         target_compile_definitions (qjsbackend PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
         if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-            set_property(TARGET qjsbackend PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+            set_property(TARGET qjsbackend PROPERTY
+                     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         endif ()
     endif ()
 endif ()
 
 if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-	set_property(TARGET puerts PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+       set_property(TARGET puerts PROPERTY
+             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif ()
 
 install(TARGETS puerts DESTINATION bin)
