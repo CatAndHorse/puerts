@@ -92,7 +92,8 @@ export default async function downloadBackend(cwd, name, url = "") {
             await downloadAndExtractTarGz(url, backendDir);
 
         } else {
-            throw new Error(`invalid backend: ${name}, backend url not found`);
+            // Allow custom backends without URL - they should be prepared externally
+            console.log(`[Puer] backend ${name} has no URL, expecting it to be built externally`);
         }
     }
 }
