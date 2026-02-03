@@ -394,7 +394,12 @@ async function runPuertsMake(cwd, options) {
     const DArgsName = ['-DBACKEND_DEFINITIONS=', '-DBACKEND_LIB_NAMES=', '-DBACKEND_INC_NAMES='];
     let CmakeDArgs = [definitionD, linkD, incD].map((r, index) => r ? DArgsName[index] + '"' + r + '"' : null).filter(t => t).join(' ');
     
-    options.websocket = options.websocket || 2;
+    // wasm platform doesn't need websocket support by default
+    if (options.platform === 'wasm') {
+        options.websocket = options.websocket || 0;
+    } else {
+        options.websocket = options.websocket || 2;
+    }
     CmakeDArgs += ` -DWITH_WEBSOCKET=${options.websocket}`;
     CmakeDArgs += ` -DWITH_SYMBOLS=${options.with_symbols ? 'ON' : 'OFF'}`;
 
