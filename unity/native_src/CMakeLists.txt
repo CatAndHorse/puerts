@@ -624,14 +624,9 @@ elseif ( APPLE )
 elseif (UNIX)
     # link
     target_link_libraries(puerts pthread)
-    
+
     # definition
     list(APPEND PUERTS_COMPILE_DEFINITIONS PLATFORM_LINUX)
-    if (NOT ("${JS_ENGINE}" STREQUAL "nodejs_16") AND NOT ("${JS_ENGINE}" STREQUAL "v8_10.6.194") AND NOT (CMAKE_SYSTEM_NAME MATCHES "Emscripten"))
-        set(CMAKE_CXX_COMPILER "clang++")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
-    endif ()
 endif ()
 
 # ref https://github.com/Tencent/puerts/issues/1796 Author:NiceTry12138 
