@@ -220,11 +220,15 @@ if(USING_QUICKJS OR USING_MULT_BACKEND)
     list(APPEND BEACKEND_QUICKJS_SRC
                         ${PROJECT_SOURCE_DIR}/backend-quickjs/src/v8-impl.cc
                         ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/cutils.c
-                        ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/libbf.c
                         ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/libregexp.c
                         ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/libunicode.c
                         ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/quickjs.c
     )
+    
+    # libbf.c is optional, only add if it exists (BigFloat support)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/libbf.c)
+        list(APPEND BEACKEND_QUICKJS_SRC ${PROJECT_SOURCE_DIR}/backend-quickjs/quickjs/libbf.c)
+    endif()
 endif()
 
 if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
