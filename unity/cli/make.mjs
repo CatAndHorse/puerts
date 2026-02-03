@@ -394,10 +394,21 @@ async function runPuertsMake(cwd, options) {
     const DArgsName = ['-DBACKEND_DEFINITIONS=', '-DBACKEND_LIB_NAMES=', '-DBACKEND_INC_NAMES='];
     let CmakeDArgs = [definitionD, linkD, incD].map((r, index) => r ? DArgsName[index] + '"' + r + '"' : null).filter(t => t).join(' ');
     
-    // wasm platform doesn't need websocket support by default
-    if (options.platform === 'wasm') {
+    // Set WebSocket default values based on backend and platform
+    // NodeJS backend: has built-in OpenSSL, conflicts with wolfSSL
+    if (options.backend.includes('nodejs')) {
         options.websocket = options.websocket || 0;
-    } else {
+    }
+    // QuickJS on Windows: wolfSSL has compilation issues, fallback to OpenSSL (websocket=3)
+    else if (options.backend.includes('quickjs') && options.platform === 'win') {
+        options.websocket = options.websocket || 3;
+    }
+    // Wasm platform: doesn't need websocket support
+    else if (options.platform === 'wasm') {
+        options.websocket = options.websocket || 0;
+    }
+    // Other backends (V8): enable WebSocket by default
+    else {
         options.websocket = options.websocket || 2;
     }
     CmakeDArgs += ` -DWITH_WEBSOCKET=${options.websocket}`;
