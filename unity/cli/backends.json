@@ -63,27 +63,6 @@
             }
         }
     },
-    "qjs_centos": {
-        "url": "",
-        "config": {
-            "definition": [
-                "V8_94_OR_NEWER",
-                "WITH_QUICKJS",
-                "WITHOUT_INSPECTOR"
-            ],
-            "include": [
-            ],
-            "link-libraries": {
-                "linux": {
-                    "x64": [
-                        "libquickjs.a"
-                    ]
-                }
-            },
-            "copy-libraries": {
-            }
-        }
-    },
     "nodejs_16": {
         "url": "https://github.com/puerts/backend-nodejs/releases/download/NodeJS_16.16.0_1115/nodejs_bin_16.16.0.tgz",
         "config": {

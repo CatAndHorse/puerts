@@ -1,16 +1,16 @@
 # CentOS-Compatible QuickJS Backend Build Action
 
-这个 Action 用于构建兼容 CentOS 的 QuickJS Backend 和 PuerTS Linux 插件。
+这个 Action 用于构建兼容 CentOS 的 PuerTS QuickJS Linux 插件。
 
 ## 功能说明
 
 1. 从 [backend-quickjs](https://github.com/puerts/backend-quickjs.git) 仓库克隆源代码
-2. 使用 GCC 12 编译 QuickJS Backend（兼容 CentOS 7+）
-3. 使用编译好的 QuickJS Backend 构建 PuerTS Linux 插件（开启 WebSocket 支持）
+2. 将 `backend-quickjs` 放置到 `unity/native_src` 目录，CMake 会直接编译其中的 QuickJS 源代码
+3. 使用 GCC 12 编译 PuerTS Linux 插件（兼容 CentOS 7+，开启 WebSocket 支持）
 4. 归档产物：
    - `puerts_linux_quickjs_centos`: PuerTS Linux 插件（含 WebSocket 支持）
 
-**注意**：QuickJS Backend 只是构建过程中的中间产物，不单独归档。
+**工作原理**：`backend-quickjs` 不是一个需要单独编译的项目，它包含 QuickJS 的源代码和适配层。CMake 会直接编译 `backend-quickjs/quickjs/` 下的 `.c` 文件来生成 QuickJS 引擎。
 
 ## 使用方法
 
@@ -39,14 +39,22 @@ jobs:
           path: ./output
 ```
 
+## 为什么需要 CentOS 兼容？
+
+CentOS 7 默认使用的 GCC 版本较旧（GCC 4.8.x），这可能导致：
+
+1. 新版 GCC 编译的库使用了 CentOS 7 不支持的符号版本
+2. 二进制兼容性问题：`GLIBCXX_3.4.21` 等符号在 CentOS 7 中不存在
+3. 运行时错误：`version 'GLIBCXX_3.4.21' not found`
+
+通过使用 GCC 12 编译，可以确保二进制库在 CentOS 7 及以上版本中正常运行。
+
 ## 为什么使用 GCC 12？
 
-虽然为了兼容 CentOS，我们最初考虑使用 GCC 7，但实践证明：
-
-1. **GCC 12 更稳定**：GCC 7 版本较老，可能缺少现代 C++ 特性支持
-2. **与生产环境一致**：生产环境使用 GCC 12，使用相同版本可避免 ABI 兼容性问题
+1. **与生产环境一致**：生产环境使用 GCC 12，使用相同版本可避免 ABI 兼容性问题
+2. **V8 预编译库兼容**：V8 预编译库通常使用较新版本的 GCC 编译，使用相同编译器家族链接可避免 ABI 问题
 3. **CentOS 7+ 兼容性**：GCC 12 编译的二进制在 CentOS 7+ 上运行良好
-4. **V8 预编译库兼容**：V8 预编译库通常使用较新版本的 GCC 编译，使用相同编译器家族链接可避免 ABI 问题
+4. **现代 C++ 特性支持**：GCC 12 更稳定，支持更多现代 C++ 特性
 
 ## CentOS 兼容性说明
 
@@ -60,6 +68,7 @@ jobs:
 
 - **GCC 版本**: GCC 12（兼容 CentOS 7+）
 - **平台**: Linux x64
+- **Backend**: QuickJS（从 `backend-quickjs` 源码编译）
 - **WebSocket**: 启用（使用 OpenSSL）
 - **配置**: Release
 
@@ -67,37 +76,30 @@ jobs:
 
 | Artifact 名称 | 内容 |
 |--------------|------|
-| `puerts_linux_quickjs_centos` | PuerTS Linux 插件（包含所有必需的库文件） |
+| `puerts_linux_quickjs_centos` | PuerTS Linux x64 QuickJS 插件（包含所有必需的库文件） |
 
-**说明**：QuickJS Backend（`libquickjs.a`）只在构建过程中使用，不单独归档。
+## Backend 编译流程
 
-## Backend 配置
+`backend-quickjs` 包含以下内容：
 
-在 `unity/cli/backends.json` 中添加了 `qjs_centos` backend 配置：
-
-```json
-"qjs_centos": {
-    "url": "",
-    "config": {
-        "definition": [
-            "V8_94_OR_NEWER",
-            "WITH_QUICKJS",
-            "WITHOUT_INSPECTOR"
-        ],
-        "include": [],
-        "link-libraries": {
-            "linux": {
-                "x64": [
-                    "libquickjs.a"
-                ]
-            }
-        }
-    }
-}
 ```
+backend-quickjs/
+├── include/          # PuerTS 适配头文件
+├── quickjs/          # QuickJS 源代码
+│   ├── quickjs.c
+│   ├── cutils.c
+│   ├── libbf.c
+│   ├── libregexp.c
+│   └── libunicode.c
+└── src/
+    └── v8-impl.cc    # V8 API 到 QuickJS 的适配层
+```
+
+CMake 会将 QuickJS 源代码直接编译进 `libpuerts.so`，无需单独编译 `libquickjs.a`。
 
 ## 注意事项
 
 1. 此 Action 仅构建 Linux x64 平台的版本
 2. 编译时间可能较长，因为需要从源码编译 QuickJS
 3. WebSocket 功能已启用，使用 OpenSSL 作为加密库
+4. `backend-quickjs` 的源代码会直接被 CMake 编译，不需要预先编译

@@ -10,6 +10,7 @@ runs:
       run: |
         rm -rf backend-quickjs
         rm -rf unity/native_src/.backends/qjs_centos
+        rm -rf unity/native_src/backend-quickjs
         rm -rf unity/Assets/core/upm/Plugins/
 
     - name: Install GCC 12
@@ -29,54 +30,13 @@ runs:
         cd backend-quickjs
         git log -1 --oneline
 
-    - name: Build QuickJS backend with CentOS compatibility
+    - name: Setup backend-quickjs directory structure
       shell: bash
       run: |
-        cd backend-quickjs
-        # 使用 make 编译 QuickJS
-        make clean || true
-        make
-        # 确认编译产物
-        ls -lh libquickjs.a || echo "Warning: libquickjs.a not found"
-        find . -name "*.a" -o -name "*.so" | head -20
-
-    - name: Create backend directory structure
-      shell: bash
-      run: |
-        cd unity/native_src
-        mkdir -p .backends/qjs_centos
-        mkdir -p .backends/qjs_centos/Inc
-        mkdir -p .backends/qjs_centos/Lib/linux/x64
-        cd ../..
-
-    - name: Copy QuickJS backend artifacts
-      shell: bash
-      run: |
-        # 复制 QuickJS 库文件
-        if [ -f backend-quickjs/libquickjs.a ]; then
-          cp backend-quickjs/libquickjs.a unity/native_src/.backends/qjs_centos/Lib/linux/x64/
-          echo "✓ Copied libquickjs.a"
-        else
-          echo "✗ Error: libquickjs.a not found"
-          find backend-quickjs -name "*.a"
-          exit 1
-        fi
-        
-        # 复制 QuickJS 头文件
-        if [ -f backend-quickjs/quickjs.h ]; then
-          cp backend-quickjs/quickjs.h unity/native_src/.backends/qjs_centos/Inc/
-          echo "✓ Copied quickjs.h"
-        else
-          echo "✗ Error: quickjs.h not found"
-          find backend-quickjs -name "*.h"
-          exit 1
-        fi
-        
-        # 查找并复制其他可能需要的头文件
-        find backend-quickjs -name "*.h" -exec cp {} unity/native_src/.backends/qjs_centos/Inc/ \; 2>/dev/null || true
-        
-        echo "Backend directory structure:"
-        ls -lR unity/native_src/.backends/qjs_centos/
+        # 将 backend-quickjs 克隆到 native_src 目录下，CMake 会直接编译 QuickJS 源代码
+        cp -r backend-quickjs unity/native_src/
+        echo "✓ Copied backend-quickjs to native_src/"
+        ls -la unity/native_src/backend-quickjs/
 
     - name: Install dependencies
       shell: bash
@@ -85,12 +45,13 @@ runs:
         npm i
         cd ..
 
-    - name: Build PuerTS with custom QuickJS backend
+    - name: Build PuerTS with QuickJS backend
       shell: bash
       run: |
         cd unity/native_src
-        # 使用自定义编译的 QuickJS backend，启用 WebSocket (3 = OpenSSL)
-        node ../cli make --platform linux --arch x64 --backend qjs_centos --config Release --websocket 3
+        # 使用 QuickJS backend，启用 WebSocket (3 = OpenSSL)
+        # backend-quickjs 会被 CMake 直接编译其中的 QuickJS 源代码
+        node ../cli make --platform linux --arch x64 --backend quickjs --config Release --websocket 3
         cd ../..
 
     - name: Check build artifacts
