@@ -9,6 +9,7 @@ runs:
       shell: bash
       run: |
         rm -rf backend-quickjs
+        rm -rf unity/native_src/.backends/quickjs
         rm -rf unity/native_src/.backends/qjs_centos
         rm -rf unity/native_src/backend-quickjs
         rm -rf unity/Assets/core/upm/Plugins/
@@ -23,12 +24,17 @@ runs:
         gcc --version
         g++ --version
 
-    - name: Clone backend-quickjs repository
+    - name: Clone backend-quickjs repository with submodules
       shell: bash
       run: |
-        git clone https://github.com/puerts/backend-quickjs.git
+        # 使用 --recursive 参数克隆仓库，确保下载子模块
+        git clone --recursive https://github.com/puerts/backend-quickjs.git
         cd backend-quickjs
         git log -1 --oneline
+        echo "=== Checking quickjs submodule ==="
+        ls -la quickjs/
+        echo "=== QuickJS source files ==="
+        ls quickjs/*.c 2>/dev/null || echo "Error: QuickJS source files not found"
 
     - name: Setup backend-quickjs directory structure
       shell: bash
@@ -37,6 +43,15 @@ runs:
         cp -r backend-quickjs unity/native_src/
         echo "✓ Copied backend-quickjs to native_src/"
         ls -la unity/native_src/backend-quickjs/
+        
+    - name: Create .backends/quickjs directory to skip download
+      shell: bash
+      run: |
+        # 创建空的 .backends/quickjs 目录，让 CLI 跳过下载预编译版本
+        # 因为 backends.json 中 quickjs 的 link-libraries 为空
+        # CMake 会直接使用 native_src/backend-quickjs/ 下的源代码编译
+        mkdir -p unity/native_src/.backends/quickjs
+        echo "✓ Created .backends/quickjs to skip precompiled download"
 
     - name: Install dependencies
       shell: bash
