@@ -34,13 +34,14 @@ runs:
   steps:
     - name: Install NASM
       shell: powershell
-      run: choco install nasm -y
-    - name: Add NASM to PATH
-      shell: powershell
-      run: echo "C:\ProgramData\chocolatey\lib\nasm\tools\nasm" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      run: |
+        choco install nasm -y --force
+        nasm -v
     - name: Build
       shell: powershell
       run: |
+        $env:Path = "C:\ProgramData\chocolatey\lib\nasm\tools;" + $env:Path
+        nasm -v
         cd unity
         npm i
         cd ${{ inputs.build_proj_dir }}
