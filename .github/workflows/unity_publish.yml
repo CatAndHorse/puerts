@@ -6,6 +6,10 @@ on:
       tag_name:
         description: 'tag name'     
         required: true
+      websocket:
+        description: 'WebSocket support level (0: disabled, 1: minimal, 2: full)'
+        required: false
+        default: '2'
 
 env:
   RUNID: 613573412
@@ -29,6 +33,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_9.4
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -39,6 +44,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_10.6.194
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -49,6 +55,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -59,6 +66,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: nodejs_16
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -69,6 +77,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
+          websocket: ${{ inputs.websocket }}
   
   ohos:
     runs-on: ubuntu-latest
@@ -88,6 +97,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_9.4
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -98,6 +108,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_10.6.194
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -108,6 +119,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -118,6 +130,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
+          websocket: ${{ inputs.websocket }}
 
   ios:
     runs-on: macos-14
@@ -129,6 +142,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_9.4
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -139,6 +153,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_10.6.194
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -149,6 +164,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -159,6 +175,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: nodejs_16
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -169,6 +186,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
+          websocket: ${{ inputs.websocket }}
 
   osx:
     runs-on: macos-14
@@ -180,6 +198,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_9.4
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -190,6 +209,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_10.6.194
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -200,6 +220,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: nodejs_16
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -210,6 +231,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -220,6 +242,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
+          websocket: ${{ inputs.websocket }}
 
   windows:
     runs-on: windows-2022
@@ -231,6 +254,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_9.4
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -241,6 +265,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_10.6.194
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -251,6 +276,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -261,6 +287,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: nodejs_16
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -271,6 +298,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
+          websocket: ${{ inputs.websocket }}
 
   linux64:
     runs-on: ubuntu-latest
@@ -282,6 +310,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_9.4
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -292,6 +321,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: v8_10.6.194
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -302,6 +332,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -312,6 +343,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: nodejs_16
+          websocket: ${{ inputs.websocket }}
       - name: reset
         shell: bash
         run: |
@@ -322,6 +354,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
+          websocket: ${{ inputs.websocket }}
           
   wasm:
     runs-on: ubuntu-latest
