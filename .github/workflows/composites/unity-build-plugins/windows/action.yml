@@ -32,6 +32,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Install NASM
+      shell: powershell
+      run: choco install nasm -y
     - name: Build
       shell: powershell
       run: |

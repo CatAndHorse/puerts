@@ -284,8 +284,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: quickjs
-          websocket: 3
-      - name: reset
+          websocket: 3      - name: reset
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE
@@ -308,7 +307,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           backend: mult
           websocket: 3
-
   linux64:
     runs-on: ubuntu-latest
     
