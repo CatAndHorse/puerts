@@ -498,9 +498,6 @@ jobs:
           fi
         shell: bash
 
-  publish:          github_token: ${{ secrets.GITHUB_TOKEN }}
-          backend: quickjs
-
   publish:
     runs-on: ubuntu-latest
     if: needs.check_publish.outputs.should_publish == 'true'
