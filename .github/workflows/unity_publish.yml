@@ -551,10 +551,31 @@ jobs:
         run: |
           cp $GITHUB_WORKSPACE/LICENSE $GITHUB_WORKSPACE/unity/Assets/core/upm
           ls -l $GITHUB_WORKSPACE/unity/Assets/core/upm
-          cd V8/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_V8_${{ github.event.inputs.tag_name }}.tgz upm && cd -
-          cd Quickjs/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_Quickjs_${{ github.event.inputs.tag_name }}.tgz upm && cd -
-          cd Nodejs/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_Nodejs_${{ github.event.inputs.tag_name }}.tgz upm && cd -
-          cd Mult/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_Mult_${{ github.event.inputs.tag_name }}.tgz upm && cd -
+          
+          # Only package backends that were included in the build
+          if [[ "${{ inputs.include_v8_9_4 }}" == "true" || "${{ inputs.include_v8_10_6 }}" == "true" ]]; then
+            if [ -d "V8" ]; then
+              cd V8/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_V8_${{ github.event.inputs.tag_name }}.tgz upm && cd -
+            fi
+          fi
+          
+          if [[ "${{ inputs.include_quickjs }}" == "true" ]]; then
+            if [ -d "Quickjs" ]; then
+              cd Quickjs/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_Quickjs_${{ github.event.inputs.tag_name }}.tgz upm && cd -
+            fi
+          fi
+          
+          if [[ "${{ inputs.include_nodejs }}" == "true" ]]; then
+            if [ -d "Nodejs" ]; then
+              cd Nodejs/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_Nodejs_${{ github.event.inputs.tag_name }}.tgz upm && cd -
+            fi
+          fi
+          
+          if [[ "${{ inputs.include_mult }}" == "true" ]]; then
+            if [ -d "Mult" ]; then
+              cd Mult/ && cp -r $GITHUB_WORKSPACE/unity/Assets/core/upm . && tar cvfz ../PuerTS_Mult_${{ github.event.inputs.tag_name }}.tgz upm && cd -
+            fi
+          fi
         if: inputs.include_v8_9_4 == true || inputs.include_v8_10_6 == true || inputs.include_quickjs == true || inputs.include_nodejs == true || inputs.include_mult == true
           
       - name: Create Release
