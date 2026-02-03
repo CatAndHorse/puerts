@@ -35,13 +35,22 @@ runs:
     - name: Install NASM
       shell: powershell
       run: |
-        choco install nasm -y --force
-        nasm -v
+        $url = "https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip"
+        $output = "$env:TEMP\nasm.zip"
+        $dest = "C:\nasm"
+        
+        Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
+        Expand-Archive -Path $output -DestinationPath $dest -Force
+        Remove-Item $output
+        
+        # 验证安装
+        & "$dest\nasm-2.16.01\nasm.exe" -v
+        
     - name: Build
       shell: powershell
       run: |
-        $env:Path = "C:\ProgramData\chocolatey\lib\nasm\tools;" + $env:Path
-        nasm -v
+        $env:Path = "C:\nasm\nasm-2.16.01;" + $env:Path
+        & "C:\nasm\nasm-2.16.01\nasm.exe" -v
         cd unity
         npm i
         cd ${{ inputs.build_proj_dir }}
