@@ -44,11 +44,21 @@ runs:
         echo "✓ Copied backend-quickjs to native_src/"
         ls -la unity/native_src/backend-quickjs/
         
-        # 创建符号链接，让 backend-quickjs/include/quickjs.h 指向 backend-quickjs/quickjs/quickjs.h
-        # 因为 backend-quickjs/include/v8.h 包含 "quickjs.h"，但是 quickjs.h 在 quickjs/ 子目录中
-        cd unity/native_src/backend-quickjs/include
-        ln -sf ../quickjs/quickjs.h quickjs.h
-        echo "✓ Created symlink for quickjs.h"
+        # 复制 quickjs.h 到 include 目录，因为多个文件都包含 "quickjs.h"
+        # quickjs.h 文件在 backend-quickjs/quickjs/ 子目录中
+        # 1. backend-quickjs/include/v8.h 包含 "quickjs.h"
+        # 2. papi-quickjs/include/ 下的多个文件也包含 "quickjs.h"
+        cp unity/native_src/backend-quickjs/quickjs/quickjs.h unity/native_src/backend-quickjs/include/quickjs.h
+        echo "✓ Copied quickjs.h to backend-quickjs/include/"
+        
+        # 同时也复制到 papi-quickjs/include/ 目录
+        cp unity/native_src/backend-quickjs/quickjs/quickjs.h unity/native_src/papi-quickjs/include/quickjs.h
+        echo "✓ Copied quickjs.h to papi-quickjs/include/"
+        
+        # 验证文件存在
+        echo "=== Verifying quickjs.h files ==="
+        ls -la unity/native_src/backend-quickjs/include/quickjs.h
+        ls -la unity/native_src/papi-quickjs/include/quickjs.h
         
     - name: Create .backends/quickjs directory to skip download
       shell: bash
