@@ -1090,10 +1090,10 @@ int JS_ReleaseLoadedModule(JSContext *ctx, const char* path);
 int JS_ValueRefCount(JSContext *ctx, JSValue v);
 
 // avoid conflict
-void *JS_GetContextOpaque1(JSContext *ctx);
-void JS_SetContextOpaque1(JSContext *ctx, void *opaque);
-void *JS_GetRuntimeOpaque1(JSRuntime *rt);
-void JS_SetRuntimeOpaque1(JSRuntime *rt, void *opaque);
+JS_EXTERN void *JS_GetContextOpaque1(JSContext *ctx);
+JS_EXTERN void JS_SetContextOpaque1(JSContext *ctx, void *opaque);
+JS_EXTERN void *JS_GetRuntimeOpaque1(JSRuntime *rt);
+JS_EXTERN void JS_SetRuntimeOpaque1(JSRuntime *rt, void *opaque);
 
 JS_EXTERN JSValue JS_NewString16Len(JSContext *ctx, const uint16_t *str1, size_t len1);
 
