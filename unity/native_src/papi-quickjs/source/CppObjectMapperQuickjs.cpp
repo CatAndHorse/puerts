@@ -377,7 +377,7 @@ void CppObjectMapper::Initialize(JSContext* ctx_)
     ctx = ctx_;
     rt = JS_GetRuntime(ctx);
     JS_SetRuntimeOpaque1(rt, this);
-    //new (&CDataCache) eastl::unordered_map<const void*, FObjectCacheNode, eastl::hash<const void*>, 
+    //new (&CDataCache) eastl::unordered_map<const void*, FObjectCacheNode, eastl::hash<const void*>,
     //        eastl::equal_to<const void*>, eastl::allocator_malloc>();
     //new (&TypeIdToFunctionMap) eastl::unordered_map<const void*, JSValue, eastl::hash<const void*>, 
     //        eastl::equal_to<const void*>, eastl::allocator_malloc>();
@@ -481,7 +481,8 @@ pesapi_env_ref create_qjs_env()
 {
     JSRuntime* rt = JS_NewRuntime();
     // 0x4000: DUMP_LEAKS, 0x8000: DUMP_ATOM_LEAKS
-    JS_SetDumpFlags(rt, 0x4000 | 0x8000);
+    // JS_SetDumpFlags not available in current QuickJS version
+    // JS_SetDumpFlags(rt, 0x4000 | 0x8000);
     JSContext* ctx = JS_NewContext(rt);
     pesapi::qjsimpl::CppObjectMapper* mapper = static_cast<pesapi::qjsimpl::CppObjectMapper*>(malloc(sizeof(pesapi::qjsimpl::CppObjectMapper)));
     

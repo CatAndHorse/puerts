@@ -4,6 +4,98 @@ namespace pesapi
 {
 namespace qjsimpl
 {
+// UTF-16 compatibility functions for QuickJS (QuickJS uses UTF-8 internally)
+static inline JSValue JS_NewString16Len(JSContext *ctx, const uint16_t *str, size_t len)
+{
+    // Convert UTF-16 to UTF-8
+    // Simplified implementation - assumes basic BMP characters only
+    size_t utf8_len = len * 3; // Maximum UTF-8 size for UTF-16
+    char *utf8_buf = (char*)malloc(utf8_len + 1);
+    if (!utf8_buf) return JS_NULL;
+    
+    size_t utf8_pos = 0;
+    for (size_t i = 0; i < len; i++) {
+        uint16_t ch = str[i];
+        if (ch < 0x80) {
+            utf8_buf[utf8_pos++] = (char)ch;
+        } else if (ch < 0x800) {
+            utf8_buf[utf8_pos++] = (char)(0xC0 | (ch >> 6));
+            utf8_buf[utf8_pos++] = (char)(0x80 | (ch & 0x3F));
+        } else {
+            utf8_buf[utf8_pos++] = (char)(0xE0 | (ch >> 12));
+            utf8_buf[utf8_pos++] = (char)(0x80 | ((ch >> 6) & 0x3F));
+            utf8_buf[utf8_pos++] = (char)(0x80 | (ch & 0x3F));
+        }
+    }
+    utf8_buf[utf8_pos] = '\0';
+    
+    JSValue result = JS_NewStringLen(ctx, utf8_buf, utf8_pos);
+    free(utf8_buf);
+    return result;
+}
+
+static inline const uint16_t* JS_ToCString16Len(JSContext *ctx, JSValue val, uint16_t *buf, size_t *bufsize)
+{
+    // Get UTF-8 string and convert to UTF-16
+    const char *utf8_str = JS_ToCString(ctx, val);
+    if (!utf8_str) return NULL;
+    
+    size_t utf8_len = strlen(utf8_str);
+    size_t utf16_needed = 0;
+    
+    // First pass: calculate required UTF-16 length
+    size_t i = 0;
+    while (i < utf8_len) {
+        uint32_t ch;
+        uint8_t c = (uint8_t)utf8_str[i++];
+        if (c < 0x80) {
+            ch = c;
+        } else if ((c & 0xE0) == 0xC0) {
+            ch = ((c & 0x1F) << 6) | ((uint8_t)utf8_str[i++] & 0x3F);
+        } else if ((c & 0xF0) == 0xE0) {
+            ch = ((c & 0x0F) << 12) | (((uint8_t)utf8_str[i++] & 0x3F) << 6) | ((uint8_t)utf8_str[i++] & 0x3F);
+        } else {
+            ch = 0xFFFD; // Replacement character
+        }
+        utf16_needed += (ch <= 0xFFFF) ? 1 : 2;
+    }
+    
+    // Check buffer size
+    if (!buf || *bufsize < utf16_needed + 1) {
+        *bufsize = utf16_needed + 1;
+        JS_FreeCString(ctx, utf8_str);
+        return NULL;
+    }
+    
+    // Second pass: convert to UTF-16
+    i = 0;
+    size_t utf16_pos = 0;
+    while (i < utf8_len) {
+        uint32_t ch;
+        uint8_t c = (uint8_t)utf8_str[i++];
+        if (c < 0x80) {
+            ch = c;
+        } else if ((c & 0xE0) == 0xC0) {
+            ch = ((c & 0x1F) << 6) | ((uint8_t)utf8_str[i++] & 0x3F);
+        } else if ((c & 0xF0) == 0xE0) {
+            ch = ((c & 0x0F) << 12) | (((uint8_t)utf8_str[i++] & 0x3F) << 6) | ((uint8_t)utf8_str[i++] & 0x3F);
+        } else {
+            ch = 0xFFFD;
+        }
+        
+        if (ch <= 0xFFFF) {
+            buf[utf16_pos++] = (uint16_t)ch;
+        } else {
+            buf[utf16_pos++] = (uint16_t)(0xD800 + ((ch - 0x10000) >> 10));
+            buf[utf16_pos++] = (uint16_t)(0xDC00 + ((ch - 0x10000) & 0x3FF));
+        }
+    }
+    buf[utf16_pos] = 0;
+    
+    JS_FreeCString(ctx, utf8_str);
+    return buf;
+}
+
 inline pesapi_value pesapiValueFromQjsValue(JSValue* v)
 {
     return reinterpret_cast<pesapi_value>(v);
