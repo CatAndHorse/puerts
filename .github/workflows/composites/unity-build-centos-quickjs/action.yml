@@ -28,7 +28,8 @@ runs:
       shell: bash
       run: |
         # 使用 --recursive 参数克隆仓库，确保下载子模块
-        git clone --recursive https://github.com/puerts/backend-quickjs.git
+        # 使用 quickjs-ng 分支，该分支包含必需的扩展 API
+        git clone --recursive -b quickjs-ng https://github.com/puerts/backend-quickjs.git
         cd backend-quickjs
         git log -1 --oneline
         echo "=== Checking quickjs submodule ==="
