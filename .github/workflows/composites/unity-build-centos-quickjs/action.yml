@@ -44,6 +44,12 @@ runs:
         echo "✓ Copied backend-quickjs to native_src/"
         ls -la unity/native_src/backend-quickjs/
         
+        # 创建符号链接，让 backend-quickjs/include/quickjs.h 指向 backend-quickjs/quickjs/quickjs.h
+        # 因为 backend-quickjs/include/v8.h 包含 "quickjs.h"，但是 quickjs.h 在 quickjs/ 子目录中
+        cd unity/native_src/backend-quickjs/include
+        ln -sf ../quickjs/quickjs.h quickjs.h
+        echo "✓ Created symlink for quickjs.h"
+        
     - name: Create .backends/quickjs directory to skip download
       shell: bash
       run: |
@@ -64,9 +70,10 @@ runs:
       shell: bash
       run: |
         cd unity/native_src
-        # 使用 QuickJS backend，启用 WebSocket (3 = OpenSSL)
+        # 使用 QuickJS backend，启用 WebSocket (2 = wolfSSL, 更轻量级)
         # backend-quickjs 会被 CMake 直接编译其中的 QuickJS 源代码
-        node ../cli make --platform linux --arch x64 --backend quickjs --config Release --websocket 3
+        # wolfSSL 是一个比 OpenSSL 更轻量级的 SSL 库
+        node ../cli make --platform linux --arch x64 --backend quickjs --config Release --websocket 2
         cd ../..
 
     - name: Check build artifacts
