@@ -97,5 +97,5 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: puerts_linux_quickjs_centos
-        path: ./unity/Assets/core/upm/Plugins/linux/**/*
+        path: ./unity/Assets/core/upm/Plugins/x86_64/**/*
         if-no-files-found: warn
