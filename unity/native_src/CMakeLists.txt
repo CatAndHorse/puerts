@@ -350,7 +350,7 @@ if ( WITH_WEBSOCKET EQUAL 3 )
         endif()
         set(OPENSSL_BUILD_COMMAND nmake)
         set(OPENSSL_LIBRARY_SUFFIX lib)
-        set(OPENSSL_CONFIGURE_COMMAND perl ${OPENSSL_SOURCE_DIR}/Configure ${OPENSSL_PLATFORM_CONF_ARG})
+        set(OPENSSL_CONFIGURE_COMMAND perl ${OPENSSL_SOURCE_DIR}/Configure ${OPENSSL_PLATFORM_CONF_ARG} no-shared)
     endif()
 
     include(ExternalProject)
