@@ -42,6 +42,10 @@ extern "C" {
 #define js_force_inline       inline __attribute__((always_inline))
 #define __js_printf_like(f, a)   __attribute__((format(printf, f, a)))
 #define JS_EXTERN __attribute__((visibility("default")))
+#elif defined(_MSC_VER)
+#define js_force_inline  __forceinline
+#define __js_printf_like(a, b)
+#define JS_EXTERN /* nothing for static library */
 #else
 #define js_force_inline  inline
 #define __js_printf_like(a, b)

@@ -56211,22 +56211,22 @@ int JS_ReleaseLoadedModule(JSContext *ctx, const char* path)
     return 0;
 }
 
-JS_EXTERN void *JS_GetContextOpaque1(JSContext *ctx)
+void *JS_GetContextOpaque1(JSContext *ctx)
 {
     return ctx->user_opaque1;
 }
 
-JS_EXTERN void JS_SetContextOpaque1(JSContext *ctx, void *opaque)
+void JS_SetContextOpaque1(JSContext *ctx, void *opaque)
 {
     ctx->user_opaque1 = opaque;
 }
 
-JS_EXTERN void *JS_GetRuntimeOpaque1(JSRuntime *rt)
+void *JS_GetRuntimeOpaque1(JSRuntime *rt)
 {
     return rt->user_opaque1;
 }
 
-JS_EXTERN void JS_SetRuntimeOpaque1(JSRuntime *rt, void *opaque)
+void JS_SetRuntimeOpaque1(JSRuntime *rt, void *opaque)
 {
     rt->user_opaque1 = opaque;
 }

@@ -49,13 +49,40 @@ if("${JS_ENGINE}" MATCHES "^quickjs")
     set(USING_QUICKJS ON)
 endif()
 
-set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/../native_src/.backends/${JS_ENGINE})
+# Find the correct V8 backend directory
+if("${JS_ENGINE}" STREQUAL "v8")
+    # List all directories in .backends that start with v8
+    file(GLOB V8_DIRS "${PROJECT_SOURCE_DIR}/.backends/v8*")
+    if(V8_DIRS)
+        # Sort directories to find the latest version (assuming version naming)
+        list(SORT V8_DIRS COMPARE NATURAL ORDER DESCENDING)
+        list(GET V8_DIRS 0 LATEST_V8_DIR)
+        get_filename_component(V8_BACKEND_NAME "${LATEST_V8_DIR}" NAME)
+        set(JS_ENGINE ${V8_BACKEND_NAME} CACHE STRING "JS Engine" FORCE)
+        message(STATUS "Auto-detected V8 backend: ${V8_BACKEND_NAME}")
+    endif()
+endif()
+
+set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/.backends/${JS_ENGINE})
 
 set(ThirdParty ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/ThirdParty)
 
+# Set backend include and lib paths for single backend builds
+if(NOT USING_MULT_BACKEND)
+    if("${JS_ENGINE}" MATCHES "^v8")
+        set(BACKEND_INC_NAMES "Inc")
+        if(WIN32 AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+            # Use DLL import libraries for Windows x64
+            set(BACKEND_LIB_NAMES "Lib/Win64DLL/v8.dll.lib;Lib/Win64DLL/v8_libplatform.dll.lib;Lib/Win64DLL/v8_libbase.dll.lib")
+        endif()
+        set(BACKEND_DEFINITIONS "V8_BACKEND")
+    endif()
+endif()
+
 if(NOT ("${JS_ENGINE}" STREQUAL "quickjs"))
-    string (REPLACE ";" "$<SEMICOLON>${BACKEND_ROOT}" BACKEND_INC_NAMES "${BACKEND_ROOT}${BACKEND_INC_NAMES}")
-    string (REPLACE ";" "$<SEMICOLON>${BACKEND_ROOT}" BACKEND_LIB_NAMES "${BACKEND_ROOT}${BACKEND_LIB_NAMES}")
+    # CMake automatically handles lists, no need for manual string replacement
+    list(TRANSFORM BACKEND_INC_NAMES PREPEND "${BACKEND_ROOT}/")
+    list(TRANSFORM BACKEND_LIB_NAMES PREPEND "${BACKEND_ROOT}/")
 endif()
 string (REPLACE ";" "$<SEMICOLON>" BACKEND_DEFINITIONS "${BACKEND_DEFINITIONS}")
 
@@ -157,7 +184,10 @@ if(USING_QUICKJS OR USING_MULT_BACKEND)
         xcheck_add_c_compiler_flag(-Wno-reserved-macro-identifier)
         xcheck_add_c_compiler_flag(-Wno-reserved-identifier)
         xcheck_add_c_compiler_flag(-Wdeprecated-declarations)
-        xcheck_add_c_compiler_flag(/experimental:c11atomics)
+        # /experimental:c11atomics is only supported in Visual Studio 2019 (16.3) or later
+        if(MSVC_VERSION GREATER_EQUAL 1920)
+            xcheck_add_c_compiler_flag(/experimental:c11atomics)
+        endif()
         xcheck_add_c_compiler_flag(/wd4018) # -Wno-sign-conversion
         xcheck_add_c_compiler_flag(/wd4061) # -Wno-implicit-fallthrough
         xcheck_add_c_compiler_flag(/wd4100) # -Wno-unused-parameter
@@ -340,6 +370,14 @@ if ( WITH_WEBSOCKET EQUAL 3 )
     set(OPENSSL_BUILD_COMMAND make)
     set(OPENSSL_LIBRARY_SUFFIX a)
     set(OPENSSL_CONFIGURE_COMMAND ${OPENSSL_SOURCE_DIR}/config)
+    
+    # Check if OpenSSL is already built
+    set(OPENSSL_ALREADY_BUILT FALSE)
+    if(EXISTS "${OPENSSL_INSTALL_DIR}/lib/libssl.lib" AND EXISTS "${OPENSSL_INSTALL_DIR}/lib/libcrypto.lib")
+        set(OPENSSL_ALREADY_BUILT TRUE)
+        message(STATUS "OpenSSL already built, skipping ExternalProject")
+    endif()
+    
     if(WIN32)
         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
             # 32位 Windows
@@ -350,41 +388,84 @@ if ( WITH_WEBSOCKET EQUAL 3 )
         endif()
         set(OPENSSL_BUILD_COMMAND nmake)
         set(OPENSSL_LIBRARY_SUFFIX lib)
-        set(OPENSSL_CONFIGURE_COMMAND perl ${OPENSSL_SOURCE_DIR}/Configure ${OPENSSL_PLATFORM_CONF_ARG} no-shared)
+        
+        # Find NASM and set environment variable for OpenSSL
+        find_program(NASM_EXECUTABLE nasm
+            HINTS
+                "C:/nasm/nasm-2.16.01"
+                "C:/nasm"
+                "$ENV{PROGRAMFILES}/NASM"
+                "$ENV{PROGRAMFILES_X86}/NASM"
+        )
+        if(NOT NASM_EXECUTABLE)
+            message(FATAL_ERROR "NASM not found. Please install NASM from https://www.nasm.us/")
+        endif()
+        message(STATUS "Using NASM: ${NASM_EXECUTABLE}")
+        # Set NASM environment variable for OpenSSL configuration
+        set(ENV{NASM} ${NASM_EXECUTABLE})
+        
+        # Use full path to Windows native Perl (Strawberry Perl) to avoid MSYS Perl path issues
+        find_program(NATIVE_PERL perl
+            HINTS
+                "C:/strawberry/perl/bin"
+                "C:/Strawberry/perl/bin"
+                "C:/Perl64/bin"
+                "C:/Perl/bin"
+        )
+        if(NOT NATIVE_PERL)
+            message(FATAL_ERROR "Native Windows Perl not found. Please install Strawberry Perl from https://strawberryperl.com/")
+        endif()
+        message(STATUS "Using native Perl: ${NATIVE_PERL}")
+        # Add NASM directory to PATH for the build
+        get_filename_component(NASM_DIR ${NASM_EXECUTABLE} DIRECTORY)
+        set(ENV{PATH} "${NASM_DIR};$ENV{PATH}")
+        set(OPENSSL_CONFIGURE_COMMAND set "PATH=${NASM_DIR};%PATH%" && set "NASM=${NASM_EXECUTABLE}" && ${NATIVE_PERL} ${OPENSSL_SOURCE_DIR}/Configure ${OPENSSL_PLATFORM_CONF_ARG} no-shared)
     endif()
 
-    include(ExternalProject)
+    if(NOT OPENSSL_ALREADY_BUILT)
+        include(ExternalProject)
 
-    ExternalProject_Add(
-      OpenSSL
-      SOURCE_DIR ${OPENSSL_SOURCE_DIR}
-      GIT_REPOSITORY https://github.com/openssl/openssl.git
-      GIT_TAG OpenSSL_1_1_1t
-      #GIT_TAG openssl-3.0.5
-      USES_TERMINAL_DOWNLOAD TRUE
-      CONFIGURE_COMMAND
-        ${OPENSSL_CONFIGURE_COMMAND}
-        --prefix=${OPENSSL_INSTALL_DIR}
-        --openssldir=${OPENSSL_INSTALL_DIR}
-      BUILD_COMMAND ${OPENSSL_BUILD_COMMAND}
-      TEST_COMMAND ""
-      INSTALL_COMMAND ${OPENSSL_BUILD_COMMAND} install
-      INSTALL_DIR ${OPENSSL_INSTALL_DIR}
-    )
+        ExternalProject_Add(
+          OpenSSL
+          SOURCE_DIR ${OPENSSL_SOURCE_DIR}
+          GIT_REPOSITORY https://github.com/openssl/openssl.git
+          GIT_TAG OpenSSL_1_1_1t
+          #GIT_TAG openssl-3.0.5
+          USES_TERMINAL_DOWNLOAD TRUE
+          CONFIGURE_COMMAND
+            cmd.exe /c "set PATH=${NASM_DIR};%PATH% && set NASM=${NASM_EXECUTABLE} && ${OPENSSL_CONFIGURE_COMMAND}"
+            --prefix=${OPENSSL_INSTALL_DIR}
+            --openssldir=${OPENSSL_INSTALL_DIR}
+          BUILD_COMMAND ${OPENSSL_BUILD_COMMAND}
+          TEST_COMMAND ""
+          INSTALL_COMMAND ${OPENSSL_BUILD_COMMAND} install
+          INSTALL_DIR ${OPENSSL_INSTALL_DIR}
+        )
 
-    file(MAKE_DIRECTORY ${OPENSSL_INCLUDE_DIR})
+        file(MAKE_DIRECTORY ${OPENSSL_INCLUDE_DIR})
 
-    add_library(OpenSSL::SSL STATIC IMPORTED GLOBAL)
-    set_property(TARGET OpenSSL::SSL PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libssl.${OPENSSL_LIBRARY_SUFFIX})
-    set_property(TARGET OpenSSL::SSL PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
-    add_dependencies(OpenSSL::SSL OpenSSL)
+        add_library(OpenSSL::SSL STATIC IMPORTED GLOBAL)
+        set_property(TARGET OpenSSL::SSL PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libssl.${OPENSSL_LIBRARY_SUFFIX})
+        set_property(TARGET OpenSSL::SSL PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
+        add_dependencies(OpenSSL::SSL OpenSSL)
 
-    add_library(OpenSSL::Crypto STATIC IMPORTED GLOBAL)
-    set_property(TARGET OpenSSL::Crypto PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libcrypto.${OPENSSL_LIBRARY_SUFFIX})
-    set_property(TARGET OpenSSL::Crypto PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
-    add_dependencies(OpenSSL::Crypto OpenSSL)
+        add_library(OpenSSL::Crypto STATIC IMPORTED GLOBAL)
+        set_property(TARGET OpenSSL::Crypto PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libcrypto.${OPENSSL_LIBRARY_SUFFIX})
+        set_property(TARGET OpenSSL::Crypto PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
+        add_dependencies(OpenSSL::Crypto OpenSSL)
 
-    add_dependencies(puerts OpenSSL)
+        add_dependencies(puerts OpenSSL)
+    else()
+        # OpenSSL already built, create imported targets without ExternalProject
+        add_library(OpenSSL::SSL STATIC IMPORTED GLOBAL)
+        set_property(TARGET OpenSSL::SSL PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libssl.${OPENSSL_LIBRARY_SUFFIX})
+        set_property(TARGET OpenSSL::SSL PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
+
+        add_library(OpenSSL::Crypto STATIC IMPORTED GLOBAL)
+        set_property(TARGET OpenSSL::Crypto PROPERTY IMPORTED_LOCATION ${OPENSSL_INSTALL_DIR}/lib/libcrypto.${OPENSSL_LIBRARY_SUFFIX})
+        set_property(TARGET OpenSSL::Crypto PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OPENSSL_INCLUDE_DIR})
+    endif()
+
     target_link_libraries(puerts OpenSSL::SSL OpenSSL::Crypto)
     list(APPEND PUERTS_COMPILE_DEFINITIONS WITH_WEBSOCKET_SSL)
 endif ()
@@ -471,6 +552,23 @@ if ( USING_MULT_BACKEND )
         target_compile_definitions (v8backend PRIVATE V8_BACKEND)
         target_compile_definitions (v8backend PRIVATE WITH_V8)
         set_target_properties(v8backend PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        if(WIN32)
+            target_link_libraries(v8backend PRIVATE 
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8.dll.lib"
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8_libplatform.dll.lib")
+            # Add custom command to copy v8 related DLLs to output directory
+            add_custom_command(TARGET puerts POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8.dll"
+                "$<TARGET_FILE_DIR:puerts>/v8.dll"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8_libplatform.dll"
+                "$<TARGET_FILE_DIR:puerts>/v8_libplatform.dll"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8_libbase.dll"
+                "$<TARGET_FILE_DIR:puerts>/v8_libbase.dll"
+                COMMENT "Copy v8 DLLs to output directory")
+        endif()
         target_link_libraries(puerts v8backend )
         target_compile_definitions (puerts PRIVATE MULT_BACKEND_V8)
         if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
@@ -543,12 +641,30 @@ if ( NOT CMAKE_BUILD_TYPE MATCHES "Release" )
 endif ()
 
 if ( MSYS OR WIN32 )
-    if ( WIN32 ) 
+    if ( WIN32 )
         target_link_libraries(puerts
             winmm.lib
             dbghelp.lib
             shlwapi.lib
         )
+        
+        # Copy V8 DLLs to output directory for single backend build
+        if(NOT USING_MULT_BACKEND AND "${JS_ENGINE}" MATCHES "^v8")
+            add_custom_command(TARGET puerts POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8.dll"
+                "$<TARGET_FILE_DIR:puerts>/v8.dll"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8_libplatform.dll"
+                "$<TARGET_FILE_DIR:puerts>/v8_libplatform.dll"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/v8_libbase.dll"
+                "$<TARGET_FILE_DIR:puerts>/v8_libbase.dll"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${BACKEND_ROOT}/Lib/Win64DLL/zlib.dll"
+                "$<TARGET_FILE_DIR:puerts>/zlib.dll"
+                COMMENT "Copy v8 DLLs to output directory")
+        endif()
     endif ()
 
     # definition
@@ -675,6 +791,12 @@ endif()
 target_link_libraries(puerts
     ${BACKEND_LIB_NAMES}
 )
+
+# Add include directory for V8 backend (single backend only)
+if (NOT USING_MULT_BACKEND)
+    target_include_directories(puerts PRIVATE ${BACKEND_INC_NAMES})
+endif()
+
 list(APPEND PUERTS_COMPILE_DEFINITIONS ${BACKEND_DEFINITIONS})
 
 target_compile_definitions (puerts PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
@@ -694,23 +816,20 @@ if( USING_MULT_BACKEND )
     if ( USING_V8)
         target_compile_definitions (v8backend PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
         if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-            set_property(TARGET v8backend PROPERTY
-                     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            set_property(TARGET v8backend PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         endif ()
     endif ()
 
     if ( USING_QJS)
         target_compile_definitions (qjsbackend PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
         if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-            set_property(TARGET qjsbackend PROPERTY
-                     MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            set_property(TARGET qjsbackend PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         endif ()
     endif ()
 endif ()
 
 if ( WIN32 AND NOT CYGWIN AND NOT ( CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" ) AND NOT ANDROID AND NOT MSYS)
-       set_property(TARGET puerts PROPERTY
-             MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+       set_property(TARGET puerts PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif ()
 
 install(TARGETS puerts DESTINATION bin)

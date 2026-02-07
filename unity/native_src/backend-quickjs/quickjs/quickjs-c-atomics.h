@@ -22,12 +22,37 @@
  * THE SOFTWARE.
  */
 
-#if (defined(__GNUC__) || defined(__GNUG__)) && !defined(__clang__)
+#ifndef QUICKJS_C_ATOMICS_H
+#define QUICKJS_C_ATOMICS_H
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+
+#define atomic_fetch_add(obj, arg) \
+    InterlockedExchangeAdd64((volatile LONG64*)(obj), (arg))
+#define atomic_compare_exchange_strong(obj, expected, desired) \
+    InterlockedCompareExchange64((volatile LONG64*)(obj), (desired), *(expected))
+#define atomic_exchange(obj, desired) \
+    InterlockedExchange64((volatile LONG64*)(obj), (desired))
+#define atomic_load(obj) \
+    *(obj)
+#define atomic_store(obj, desired) \
+    InterlockedExchange64((volatile LONG64*)(obj), (desired))
+#define atomic_fetch_or(obj, arg) \
+    InterlockedOr64((volatile LONG64*)(obj), (arg))
+#define atomic_fetch_xor(obj, arg) \
+    InterlockedXor64((volatile LONG64*)(obj), (arg))
+#define atomic_fetch_and(obj, arg) \
+    InterlockedAnd64((volatile LONG64*)(obj), (arg))
+#define atomic_fetch_sub(obj, arg) \
+    InterlockedExchangeAdd64((volatile LONG64*)(obj), -((LONG64)(arg)))
+#define _Atomic
+
+#elif (defined(__GNUC__) || defined(__GNUG__)) && !defined(__clang__)
    // Use GCC builtins for version < 4.9
 #  if((__GNUC__ << 16) + __GNUC_MINOR__ < ((4) << 16) + 9)
 #    define GCC_BUILTIN_ATOMICS
 #  endif
-#endif
 
 #ifdef GCC_BUILTIN_ATOMICS
 #define atomic_fetch_add(obj, arg) \
@@ -52,3 +77,8 @@
 #else
 #include <stdatomic.h>
 #endif
+#else
+#include <stdatomic.h>
+#endif
+
+#endif // QUICKJS_C_ATOMICS_H
