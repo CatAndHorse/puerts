@@ -54,6 +54,14 @@ set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/.backends/${JS_ENGINE})
 set(ThirdParty ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/ThirdParty)
 
 if(NOT ("${JS_ENGINE}" STREQUAL "quickjs"))
+    # Add path separator if BACKEND_INC_NAMES/BACKEND_LIB_NAMES don't start with /
+    if(NOT BACKEND_INC_NAMES MATCHES "^/")
+        set(BACKEND_INC_NAMES "/${BACKEND_INC_NAMES}")
+    endif()
+    if(NOT BACKEND_LIB_NAMES MATCHES "^/")
+        set(BACKEND_LIB_NAMES "/${BACKEND_LIB_NAMES}")
+    endif()
+    
     string (REPLACE ";" "$<SEMICOLON>${BACKEND_ROOT}" BACKEND_INC_NAMES "${BACKEND_ROOT}${BACKEND_INC_NAMES}")
     string (REPLACE ";" "$<SEMICOLON>${BACKEND_ROOT}" BACKEND_LIB_NAMES "${BACKEND_ROOT}${BACKEND_LIB_NAMES}")
 endif()
