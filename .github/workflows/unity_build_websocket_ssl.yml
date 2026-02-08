@@ -52,7 +52,7 @@ jobs:
   # Windows Build Job
   # ============================================
   build-windows:
-    if: github.event.inputs.platform == 'windows' || github.event.inputs.platform == 'all'
+    if: github.event.inputs.platform == 'windows' || github.event.inputs.platform == 'all' || github.event_name == 'push'
     runs-on: windows-2022
     
     steps:
