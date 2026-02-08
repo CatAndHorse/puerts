@@ -94,15 +94,14 @@ jobs:
       - name: Download V8 Backend
         shell: bash
         run: |
-          cd unity
-          node cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          cd unity/native_src
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
           
           echo "=== Verifying Backend Download ==="
-          ls -la native_src/.backends/
+          ls -la .backends/
           
       - name: Configure CMake (WolfSSL)
-        if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
-        shell: bash
+        if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''        shell: bash
         run: |
           cd unity/native_src
           mkdir -p build_win_x64_v8_ws_wolfssl
@@ -293,11 +292,11 @@ jobs:
           
       - name: Download V8 Backend
         run: |
-          cd unity
-          node cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          cd unity/native_src
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
           
           echo "=== Verifying Backend Download ==="
-          ls -la native_src/.backends/
+          ls -la .backends/
           
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
@@ -442,11 +441,11 @@ jobs:
           
       - name: Download V8 Backend
         run: |
-          cd unity
-          node cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          cd unity/native_src
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
           
           echo "=== Verifying Backend Download ==="
-          ls -la native_src/.backends/
+          ls -la .backends/
           
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
