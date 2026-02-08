@@ -72,6 +72,26 @@
 
 ---
 
+### 🍎 [关键修复：iOS WolfSSL 链接问题](./IOS_WOLFSSL_LINKING_FIX.md) ⭐ **iOS 必读**
+
+详细记录了 iOS 构建时 WolfSSL 符号找不到问题的解决方案。
+
+**适合以下情况**：
+- 遇到 `Undefined symbols: "_wolfSSL_*"` 错误
+- iOS 构建时链接失败
+- 需要了解静态链接顺序问题
+- 需要了解预编译库的依赖处理
+
+**包含内容**：
+- 问题症状和根本原因分析
+- 静态链接顺序详解
+- CMakeLists.txt 修复方案
+- Windows vs iOS 链接行为对比
+- 验证修复的方法
+- 关键教训总结
+
+---
+
 ### 📊 [项目总结](./PROJECT_SUMMARY.md)
 
 项目概览、技术细节和维护指南。
@@ -126,6 +146,14 @@
 
 ---
 
+### 场景 3.2：iOS 构建时遇到 "Undefined symbols: \"_wolfSSL_*\"" 错误
+
+👉 阅读 **[IOS_WOLFSSL_LINKING_FIX.md](./IOS_WOLFSSL_LINKING_FIX.md)** ⭐
+
+这是 iOS 静态链接顺序问题，文档中有详细的解决方案。
+
+---
+
 ### 场景 4：我想了解这个系统是如何工作的
 
 👉 阅读 **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)**
@@ -159,6 +187,7 @@
 - 📖 [完整文档](./README.md)
 - 🔍 [故障排查](./TROUBLESHOOTING.md)
 - 🔧 [关键修复：V8 头文件](./CRITICAL_FIX_V8_HEADERS.md) ⭐
+- 🍎 [关键修复：iOS WolfSSL](./IOS_WOLFSSL_LINKING_FIX.md) ⭐
 - 📊 [项目总结](./PROJECT_SUMMARY.md)
 
 ### 外部资源
@@ -180,6 +209,7 @@ unity-build-websocket-ssl/
 ├── README.md                   # 完整使用文档
 ├── TROUBLESHOOTING.md          # 故障排查清单
 ├── CRITICAL_FIX_V8_HEADERS.md  # 关键修复：V8 头文件问题 ⭐
+├── IOS_WOLFSSL_LINKING_FIX.md  # 关键修复：iOS WolfSSL 链接问题 ⭐
 └── PROJECT_SUMMARY.md          # 项目总结
 ```
 
@@ -252,4 +282,4 @@ unity-build-websocket-ssl/
 ---
 
 **最后更新**：2026-02-08  
-**版本**：1.1.0
+**版本**：1.2.0

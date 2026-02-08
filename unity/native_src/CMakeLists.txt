@@ -683,6 +683,13 @@ endif()
 target_link_libraries(puerts
     ${BACKEND_LIB_NAMES}
 )
+
+# Link WolfSSL after backend libraries for static linking (especially iOS)
+# This ensures WolfSSL symbols are available when resolving backend library dependencies
+if ( WITH_WEBSOCKET EQUAL 2 )
+    target_link_libraries(puerts wolfssl)
+endif()
+
 list(APPEND PUERTS_COMPILE_DEFINITIONS ${BACKEND_DEFINITIONS})
 
 target_compile_definitions (puerts PUBLIC ${PUERTS_COMPILE_DEFINITIONS})
