@@ -166,13 +166,12 @@ jobs:
           cmake .. \
             -G "Visual Studio 17 2022" -A x64 \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DBACKEND_INC_NAMES=/Inc \
-            -DBACKEND_LIB_NAMES=/Lib/Win64/wee8.lib \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/Win64/wee8.lib \
             -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=2 \
             -DUSING_MULT_BACKEND=OFF \
             -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
-          
           
           echo "=== Verifying CMake Configuration ==="
           grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
@@ -349,8 +348,8 @@ jobs:
           cmake .. \
             -G "Unix Makefiles" \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DBACKEND_INC_NAMES=/Inc \
-            -DBACKEND_LIB_NAMES=/Lib/Linux/libwee8.a \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/Linux/libwee8.a \
             -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=2 \
             -DUSING_MULT_BACKEND=OFF \
@@ -484,8 +483,8 @@ jobs:
           cmake .. \
             -G "Unix Makefiles" \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DBACKEND_INC_NAMES=/Inc \
-            -DBACKEND_LIB_NAMES=/Lib/macOS/libwee8.a \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/macOS/libwee8.a \
             -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=2 \
             -DUSING_MULT_BACKEND=OFF \
@@ -505,12 +504,12 @@ jobs:
           cmake .. \
             -G "Unix Makefiles" \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DBACKEND_INC_NAMES=/Inc \
-            -DBACKEND_LIB_NAMES=/Lib/macOS/libwee8.a \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/macOS/libwee8.a \
             -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=3 \
             -DUSING_MULT_BACKEND=OFF \
-            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}          
+            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
           echo "=== Verifying CMake Configuration ==="
           grep -E "WITH_WEBSOCKET|JS_ENGINE|openssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
           
