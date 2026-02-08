@@ -380,6 +380,27 @@ A: 支持，需要使用相应的编译器和工具链，本文档仅针对 Wind
 - ✅ 需要可重复的构建过程
 - ✅ 团队协作开发
 
+#### 常见问题
+
+**Q: GitHub Actions 编译失败，提示找不到 v8.h 头文件？**
+
+A: 这是因为 V8 后端没有被正确下载。确保工作流中包含以下步骤：
+
+```yaml
+- name: Download V8 Backend
+  run: |
+    cd unity
+    node cli/cmd.mjs download v8_9.4.146.24
+```
+
+该步骤会自动从 GitHub Releases 下载并解压 V8 后端到 `unity/native_src/.backends/` 目录。
+
+**Q: 如何验证 V8 后端是否正确下载？**
+
+A: 检查以下目录是否存在：
+- `unity/native_src/.backends/v8_9.4.146.24/Inc/v8.h`
+- `unity/native_src/.backends/v8_9.4.146.24/Lib/Win64/`
+
 ---
 
 **文档结束**
