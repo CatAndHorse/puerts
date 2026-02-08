@@ -94,6 +94,8 @@ jobs:
       - name: Download V8 Backend
         shell: bash
         run: |
+          set -e  # Exit immediately if any command fails
+          
           echo "=== Current Directory ==="
           pwd
           
@@ -104,96 +106,53 @@ jobs:
           echo "=== Downloading V8 Backend: ${{ github.event.inputs.backend || 'v8_9.4.146.24' }} ==="
           node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
           
-          echo "=== Verifying Backend Download ==="
-          if [ -d ".backends" ]; then
-            echo "✅ .backends directory exists"
-            ls -la .backends/
-            
-            if [ -d ".backends/v8_9.4.146.24" ]; then
-              echo "✅ V8 backend directory exists"
-              ls -la .backends/v8_9.4.146.24/
-              
-              if [ -f ".backends/v8_9.4.146.24/Inc/v8.h" ]; then
-                echo "✅ v8.h header file found"
-              else
-                echo "❌ ERROR: v8.h not found!"
-                exit 1
-              fi
-            else
-              echo "❌ ERROR: V8 backend directory not found!"
-              exit 1
-            fi
-          else
-            echo "❌ ERROR: .backends directory not found!"
-            exit 1
-          fi
+          echo "=== Download command completed successfully ==="
           
-      - name: Pre-Build Verification
+      - name: Verify V8 Backend Download
         shell: bash
         run: |
+          set -e  # Exit immediately if any command fails
+          
           cd unity/native_src
           
           BACKEND_VERSION="${{ github.event.inputs.backend || 'v8_9.4.146.24' }}"
-          BACKEND_PATH=".backends/${BACKEND_VERSION}"
           
-          echo "=== Pre-Build Verification ==="
-          echo "Backend Version: ${BACKEND_VERSION}"
-          echo "Backend Path: ${BACKEND_PATH}"
-          echo ""
+          echo "=== Verifying V8 Backend: ${BACKEND_VERSION} ==="
           
           # Check .backends directory
           if [ ! -d ".backends" ]; then
-            echo "❌ FATAL ERROR: .backends directory does not exist!"
-            echo "Current directory: $(pwd)"
-            echo "Directory contents:"
+            echo "❌ FATAL: .backends directory does not exist!"
             ls -la
             exit 1
           fi
+          echo "✅ .backends directory exists"
           
           # Check backend version directory
-          if [ ! -d "${BACKEND_PATH}" ]; then
-            echo "❌ FATAL ERROR: Backend directory ${BACKEND_PATH} does not exist!"
-            echo "Available backends:"
+          if [ ! -d ".backends/${BACKEND_VERSION}" ]; then
+            echo "❌ FATAL: Backend directory .backends/${BACKEND_VERSION} does not exist!"
             ls -la .backends/
             exit 1
           fi
+          echo "✅ Backend directory exists"
           
-          # Check Inc directory
-          if [ ! -d "${BACKEND_PATH}/Inc" ]; then
-            echo "❌ FATAL ERROR: Include directory ${BACKEND_PATH}/Inc does not exist!"
-            echo "Backend directory contents:"
-            ls -la "${BACKEND_PATH}/"
+          # Check v8.h
+          if [ ! -f ".backends/${BACKEND_VERSION}/Inc/v8.h" ]; then
+            echo "❌ FATAL: v8.h not found!"
+            ls -la ".backends/${BACKEND_VERSION}/Inc/" || echo "Inc directory does not exist"
             exit 1
           fi
+          echo "✅ v8.h found"
           
-          # Check v8.h header
-          if [ ! -f "${BACKEND_PATH}/Inc/v8.h" ]; then
-            echo "❌ FATAL ERROR: v8.h header file not found at ${BACKEND_PATH}/Inc/v8.h!"
-            echo "Include directory contents:"
-            ls -la "${BACKEND_PATH}/Inc/"
+          # Check libplatform/libplatform.h
+          if [ ! -f ".backends/${BACKEND_VERSION}/Inc/libplatform/libplatform.h" ]; then
+            echo "❌ FATAL: libplatform/libplatform.h not found!"
+            ls -la ".backends/${BACKEND_VERSION}/Inc/libplatform/" || echo "libplatform directory does not exist"
             exit 1
           fi
+          echo "✅ libplatform/libplatform.h found"
           
-          # Check libplatform directory
-          if [ ! -d "${BACKEND_PATH}/Inc/libplatform" ]; then
-            echo "❌ FATAL ERROR: libplatform directory not found at ${BACKEND_PATH}/Inc/libplatform!"
-            echo "Include directory contents:"
-            ls -la "${BACKEND_PATH}/Inc/"
-            exit 1
-          fi
-          
-          # Check libplatform.h header
-          if [ ! -f "${BACKEND_PATH}/Inc/libplatform/libplatform.h" ]; then
-            echo "❌ FATAL ERROR: libplatform.h not found!"
-            echo "libplatform directory contents:"
-            ls -la "${BACKEND_PATH}/Inc/libplatform/"
-            exit 1
-          fi
-          
-          echo "✅ All V8 backend files verified successfully!"
           echo ""
-          echo "Backend structure:"
-          find "${BACKEND_PATH}" -type f -name "*.h" | head -20
+          echo "=== ✅ All V8 backend files verified successfully! ==="
           
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
