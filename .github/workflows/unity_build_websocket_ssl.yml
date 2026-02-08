@@ -91,6 +91,15 @@ jobs:
           cd unity
           npm install
           
+      - name: Download V8 Backend
+        shell: bash
+        run: |
+          cd unity
+          node cli/cmd.mjs download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          
+          echo "=== Verifying Backend Download ==="
+          ls -la native_src/.backends/
+          
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
         shell: bash
@@ -282,6 +291,14 @@ jobs:
           cd unity
           npm install
           
+      - name: Download V8 Backend
+        run: |
+          cd unity
+          node cli/cmd.mjs download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          
+          echo "=== Verifying Backend Download ==="
+          ls -la native_src/.backends/
+          
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
         run: |
@@ -422,6 +439,14 @@ jobs:
         run: |
           cd unity
           npm install
+          
+      - name: Download V8 Backend
+        run: |
+          cd unity
+          node cli/cmd.mjs download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          
+          echo "=== Verifying Backend Download ==="
+          ls -la native_src/.backends/
           
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
