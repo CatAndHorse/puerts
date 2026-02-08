@@ -94,11 +94,39 @@ jobs:
       - name: Download V8 Backend
         shell: bash
         run: |
+          echo "=== Current Directory ==="
+          pwd
+          
+          echo "=== Changing to native_src directory ==="
           cd unity/native_src
+          pwd
+          
+          echo "=== Downloading V8 Backend: ${{ github.event.inputs.backend || 'v8_9.4.146.24' }} ==="
           node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
           
           echo "=== Verifying Backend Download ==="
-          ls -la .backends/
+          if [ -d ".backends" ]; then
+            echo "✅ .backends directory exists"
+            ls -la .backends/
+            
+            if [ -d ".backends/v8_9.4.146.24" ]; then
+              echo "✅ V8 backend directory exists"
+              ls -la .backends/v8_9.4.146.24/
+              
+              if [ -f ".backends/v8_9.4.146.24/Inc/v8.h" ]; then
+                echo "✅ v8.h header file found"
+              else
+                echo "❌ ERROR: v8.h not found!"
+                exit 1
+              fi
+            else
+              echo "❌ ERROR: V8 backend directory not found!"
+              exit 1
+            fi
+          else
+            echo "❌ ERROR: .backends directory not found!"
+            exit 1
+          fi
           
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
