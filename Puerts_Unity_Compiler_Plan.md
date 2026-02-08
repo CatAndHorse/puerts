@@ -395,7 +395,7 @@ A: 这是因为 V8 后端没有被正确下载。确保工作流中包含以下�
 
 该步骤会自动从 GitHub Releases 下载并解压 V8 后端到 `unity/native_src/.backends/` 目录。
 
-**Q2: GitHub Actions 提示 "error: unknown command 'download'"？**
+**Q2: GitHub Actions 提示 \"error: unknown command 'download'\"？**
 
 A: 这是命令格式错误。正确的命令格式是：
 
@@ -409,6 +409,25 @@ node cli/cmd.mjs backend download v8_9.4.146.24
 
 注意需要在 `download` 前面加上 `backend` 子命令。
 
+**Q2.1: GitHub Actions 提示 \"invalid puerts native_src directory\"？**
+
+A: 这是因为脚本需要在 `native_src` 目录下运行（它会检查 `CMakeLists.txt` 是否存在）。正确的命令应该是：
+
+```yaml
+# ❌ 错误 - 在 unity 目录下运行
+- name: Download V8 Backend
+  run: |
+    cd unity
+    node cli/cmd.mjs backend download v8_9.4.146.24
+
+# ✅ 正确 - 在 native_src 目录下运行
+- name: Download V8 Backend
+  run: |
+    cd unity/native_src
+    node ../cli/cmd.mjs backend download v8_9.4.146.24
+```
+
+**原因**：`backend.mjs` 脚本会检查当前目录是否包含 `CMakeLists.txt`，如果不存在则抛出错误。
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
