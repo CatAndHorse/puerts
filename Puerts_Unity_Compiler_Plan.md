@@ -571,6 +571,28 @@ BACKEND_LIB_NAMES:UNINITIALIZED=/Lib/Win64/wee8.lib  # 或对应平台的路径
    if: github.event.inputs.ssl_backend != 'openssl'
    ```
 
+3. **Git Bash 路径转换问题** ⚠️ **重要**：
+   
+   在 Windows 的 Git Bash 中，以 `/` 开头的路径会被自动转换为绝对路径：
+   
+   ```yaml
+   # ❌ 错误 - Git Bash 会将 /Inc 转换为 C:/Program Files/Git/Inc
+   -DBACKEND_INC_NAMES=/Inc
+   -DBACKEND_LIB_NAMES=/Lib/Win64/wee8.lib
+   
+   # ✅ 正确 - 使用相对路径
+   -DBACKEND_INC_NAMES=Inc
+   -DBACKEND_LIB_NAMES=Lib/Win64/wee8.lib
+   ```
+   
+   **症状**：CMakeCache.txt 中显示：
+   ```
+   BACKEND_INC_NAMES:UNINITIALIZED=C:/Program Files/Git/Inc
+   BACKEND_LIB_NAMES:UNINITIALIZED=C:/Program Files/Git/Lib/Win64/wee8.lib
+   ```
+   
+   **解决方法**：使用相对路径（不以 `/` 开头）
+
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
