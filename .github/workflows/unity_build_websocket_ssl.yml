@@ -128,6 +128,73 @@ jobs:
             exit 1
           fi
           
+      - name: Pre-Build Verification
+        shell: bash
+        run: |
+          cd unity/native_src
+          
+          BACKEND_VERSION="${{ github.event.inputs.backend || 'v8_9.4.146.24' }}"
+          BACKEND_PATH=".backends/${BACKEND_VERSION}"
+          
+          echo "=== Pre-Build Verification ==="
+          echo "Backend Version: ${BACKEND_VERSION}"
+          echo "Backend Path: ${BACKEND_PATH}"
+          echo ""
+          
+          # Check .backends directory
+          if [ ! -d ".backends" ]; then
+            echo "❌ FATAL ERROR: .backends directory does not exist!"
+            echo "Current directory: $(pwd)"
+            echo "Directory contents:"
+            ls -la
+            exit 1
+          fi
+          
+          # Check backend version directory
+          if [ ! -d "${BACKEND_PATH}" ]; then
+            echo "❌ FATAL ERROR: Backend directory ${BACKEND_PATH} does not exist!"
+            echo "Available backends:"
+            ls -la .backends/
+            exit 1
+          fi
+          
+          # Check Inc directory
+          if [ ! -d "${BACKEND_PATH}/Inc" ]; then
+            echo "❌ FATAL ERROR: Include directory ${BACKEND_PATH}/Inc does not exist!"
+            echo "Backend directory contents:"
+            ls -la "${BACKEND_PATH}/"
+            exit 1
+          fi
+          
+          # Check v8.h header
+          if [ ! -f "${BACKEND_PATH}/Inc/v8.h" ]; then
+            echo "❌ FATAL ERROR: v8.h header file not found at ${BACKEND_PATH}/Inc/v8.h!"
+            echo "Include directory contents:"
+            ls -la "${BACKEND_PATH}/Inc/"
+            exit 1
+          fi
+          
+          # Check libplatform directory
+          if [ ! -d "${BACKEND_PATH}/Inc/libplatform" ]; then
+            echo "❌ FATAL ERROR: libplatform directory not found at ${BACKEND_PATH}/Inc/libplatform!"
+            echo "Include directory contents:"
+            ls -la "${BACKEND_PATH}/Inc/"
+            exit 1
+          fi
+          
+          # Check libplatform.h header
+          if [ ! -f "${BACKEND_PATH}/Inc/libplatform/libplatform.h" ]; then
+            echo "❌ FATAL ERROR: libplatform.h not found!"
+            echo "libplatform directory contents:"
+            ls -la "${BACKEND_PATH}/Inc/libplatform/"
+            exit 1
+          fi
+          
+          echo "✅ All V8 backend files verified successfully!"
+          echo ""
+          echo "Backend structure:"
+          find "${BACKEND_PATH}" -type f -name "*.h" | head -20
+          
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
         shell: bash
