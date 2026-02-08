@@ -503,6 +503,7 @@ if ( USING_MULT_BACKEND )
             ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
             Src/PluginImpl.cpp
             ${PUERTS_BACKEND_SRC}
+            ${BEACKEND_QUICKJS_SRC}
         )
         if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
             list(APPEND BEACKEND_QUICKJS_INC ${PROJECT_SOURCE_DIR}/papi-quickjs/include)
