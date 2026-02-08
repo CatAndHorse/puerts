@@ -38,14 +38,10 @@
 extern "C" {
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__) || defined(__APPLE__)
+/* Include __APPLE__ to ensure iOS/macOS builds always define JS_EXTERN */
 #define js_force_inline       inline __attribute__((always_inline))
 #define __js_printf_like(f, a)   __attribute__((format(printf, f, a)))
-#define JS_EXTERN __attribute__((visibility("default")))
-#elif defined(__APPLE__)
-/* iOS/macOS may not define __GNUC__ or __clang__ in some build configurations */
-#define js_force_inline  inline
-#define __js_printf_like(a, b)
 #define JS_EXTERN __attribute__((visibility("default")))
 #else
 #define js_force_inline  inline
