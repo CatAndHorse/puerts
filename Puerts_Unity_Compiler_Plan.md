@@ -436,6 +436,24 @@ A: 这通常是因为 V8 Backend 下载步骤失败或未正确执行。解决�
 1. **检查下载步骤日志**：确认是否有 "✅ v8.h header file found" 输出
 2. **验证 .backends 目录**：确保 `unity/native_src/.backends/v8_9.4.146.24/Inc/v8.h` 存在
 3. **检查工作流版本**：确保使用的是最新的工作流文件（不是缓存的旧版本）
+4. **检查 CMakeLists.txt 中的 BACKEND_ROOT 路径**：确保路径正确
+
+**常见路径错误**：
+
+```cmake
+# ❌ 错误 - 多余的 ../native_src/
+set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/../native_src/.backends/${JS_ENGINE})
+
+# ✅ 正确 - PROJECT_SOURCE_DIR 已经是 native_src 目录
+set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/.backends/${JS_ENGINE})
+```
+
+**症状**：
+- V8 Backend 下载成功（日志显示 "✅ v8.h header file found"）
+- 但编译时仍然报错：`error C1083: Cannot open include file: 'libplatform/libplatform.h'`
+- 这说明 CMake 在错误的路径中查找头文件
+
+**解决方法**：修复 `unity/native_src/CMakeLists.txt` 第 52 行的路径
 
 **详细验证步骤**：
 
@@ -459,6 +477,18 @@ A: 这通常是因为 V8 Backend 下载步骤失败或未正确执行。解决�
 - 清除 GitHub Actions 缓存
 - 手动触发新的工作流运行
 - 检查网络连接（V8 backend 从 GitHub Releases 下载）
+
+**Q2.3: 如何验证 CMake 是否正确找到 V8 头文件？**
+
+A: 查看 "Configure CMake" 步骤的日志，应该看到：
+
+```
+-- BACKEND_ROOT: D:/a/puerts/puerts/unity/native_src/.backends/v8_9.4.146.24
+-- V8 include directory: D:/a/puerts/puerts/unity/native_src/.backends/v8_9.4.146.24/Inc
+```
+
+如果路径中包含 `/../native_src/.backends/`（多余的部分），则说明 CMakeLists.txt 需要修复。
+
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
