@@ -382,7 +382,7 @@ A: 支持，需要使用相应的编译器和工具链，本文档仅针对 Wind
 
 #### 常见问题
 
-**Q: GitHub Actions 编译失败，提示找不到 v8.h 头文件？**
+**Q1: GitHub Actions 编译失败，提示找不到 v8.h 头文件？**
 
 A: 这是因为 V8 后端没有被正确下载。确保工作流中包含以下步骤：
 
@@ -390,16 +390,37 @@ A: 这是因为 V8 后端没有被正确下载。确保工作流中包含以下�
 - name: Download V8 Backend
   run: |
     cd unity
-    node cli/cmd.mjs download v8_9.4.146.24
+    node cli/cmd.mjs backend download v8_9.4.146.24
 ```
 
 该步骤会自动从 GitHub Releases 下载并解压 V8 后端到 `unity/native_src/.backends/` 目录。
 
-**Q: 如何验证 V8 后端是否正确下载？**
+**Q2: GitHub Actions 提示 "error: unknown command 'download'"？**
+
+A: 这是命令格式错误。正确的命令格式是：
+
+```bash
+# ❌ 错误
+node cli/cmd.mjs download v8_9.4.146.24
+
+# ✅ 正确
+node cli/cmd.mjs backend download v8_9.4.146.24
+```
+
+注意需要在 `download` 前面加上 `backend` 子命令。
+
+**Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
 - `unity/native_src/.backends/v8_9.4.146.24/Inc/v8.h`
 - `unity/native_src/.backends/v8_9.4.146.24/Lib/Win64/`
+
+**Q4: 如何配置自动触发构建？**
+
+A: 工作流已配置为在推送到 `unity-2.2.x` 分支时自动触发，监控以下路径的变更：
+- `unity/native_src/**`
+- `.github/workflows/unity_build_websocket_ssl.yml`
+- `.github/workflows/composites/unity-build-websocket-ssl/**`
 
 ---
 
