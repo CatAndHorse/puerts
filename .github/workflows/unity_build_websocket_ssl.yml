@@ -166,25 +166,6 @@ jobs:
           cmake .. \
             -G "Visual Studio 17 2022" -A x64 \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DWITH_WEBSOCKET=2 \
-            -DUSING_MULT_BACKEND=OFF \
-            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
-          
-          echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
-          
-      - name: Configure CMake (WolfSSL)
-        if: github.event.inputs.ssl_backend != 'openssl'
-        shell: bash
-        run: |
-          cd unity/native_src
-          mkdir -p build_win_x64_v8_ws_wolfssl
-          cd build_win_x64_v8_ws_wolfssl
-          
-          echo "=== Configuring CMake with WolfSSL ==="
-          cmake .. \
-            -G "Visual Studio 17 2022" -A x64 \
-            -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
             -DBACKEND_INC_NAMES=/Inc \
             -DBACKEND_LIB_NAMES=/Lib/Win64/wee8.lib \
             -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
@@ -192,8 +173,10 @@ jobs:
             -DUSING_MULT_BACKEND=OFF \
             -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
           
+          
           echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"          
+          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
+          
       - name: Build Plugin
         shell: bash
         run: |
@@ -376,29 +359,10 @@ jobs:
           echo "=== Verifying CMake Configuration ==="
           grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
           
-      - name: Configure CMake (WolfSSL)
-        if: github.event.inputs.ssl_backend != 'openssl'
-        run: |
-          cd unity/native_src
-          mkdir -p build_linux_x64_v8_ws_wolfssl
-          cd build_linux_x64_v8_ws_wolfssl
-          
-          echo "=== Configuring CMake with WolfSSL ==="
-          cmake .. \
-            -G "Unix Makefiles" \
-            -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DBACKEND_INC_NAMES=/Inc \
-            -DBACKEND_LIB_NAMES=/Lib/Linux/libwee8.a \
-            -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
-            -DWITH_WEBSOCKET=2 \
-            -DUSING_MULT_BACKEND=OFF \
-            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}          
-          echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|openssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
-          
       - name: Build Plugin
         run: |
           cd unity/native_src
+          
           
           if [ "${{ github.event.inputs.ssl_backend }}" == "openssl" ]; then
             BUILD_DIR="build_linux_x64_v8_ws_openssl"
