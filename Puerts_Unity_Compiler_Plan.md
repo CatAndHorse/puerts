@@ -489,6 +489,77 @@ A: 查看 "Configure CMake" 步骤的日志，应该看到：
 
 如果路径中包含 `/../native_src/.backends/`（多余的部分），则说明 CMakeLists.txt 需要修复。
 
+**Q2.4: CMake 警告 "Target puerts requests linking to directory"？**
+
+A: 这是因为 CMake 配置时缺少了 `BACKEND_INC_NAMES`、`BACKEND_LIB_NAMES` 和 `BACKEND_DEFINITIONS` 参数。
+
+**错误症状**：
+```
+CMake Warning at CMakeLists.txt:675 (target_link_libraries):
+  Target "puerts" requests linking to directory
+  "D:/a/puerts/puerts/unity/native_src/.backends/v8_9.4.146.24".  Targets may
+  link only to libraries.  CMake is dropping the item.
+```
+
+**根本原因**：
+- V8 Backend 下载成功
+- 但 CMake 不知道如何链接 V8 库，因为缺少必要的参数
+- 导致编译时找不到 V8 头文件和库文件
+
+**解决方法**：
+
+在 CMake 配置命令中添加以下参数：
+
+```bash
+# Windows
+cmake .. \
+  -G "Visual Studio 17 2022" -A x64 \
+  -DJS_ENGINE=v8_9.4.146.24 \
+  -DBACKEND_INC_NAMES=/Inc \
+  -DBACKEND_LIB_NAMES=/Lib/Win64/wee8.lib \
+  -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
+  -DWITH_WEBSOCKET=2 \
+  -DUSING_MULT_BACKEND=OFF \
+  -DCMAKE_BUILD_TYPE=Release
+
+# Linux
+cmake .. \
+  -G "Unix Makefiles" \
+  -DJS_ENGINE=v8_9.4.146.24 \
+  -DBACKEND_INC_NAMES=/Inc \
+  -DBACKEND_LIB_NAMES=/Lib/Linux/libwee8.a \
+  -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
+  -DWITH_WEBSOCKET=2 \
+  -DUSING_MULT_BACKEND=OFF \
+  -DCMAKE_BUILD_TYPE=Release
+
+# macOS
+cmake .. \
+  -G "Unix Makefiles" \
+  -DJS_ENGINE=v8_9.4.146.24 \
+  -DBACKEND_INC_NAMES=/Inc \
+  -DBACKEND_LIB_NAMES=/Lib/macOS/libwee8.a \
+  -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
+  -DWITH_WEBSOCKET=2 \
+  -DUSING_MULT_BACKEND=OFF \
+  -DCMAKE_BUILD_TYPE=Release
+```
+
+**验证修复**：
+
+配置成功后，检查 `CMakeCache.txt`：
+
+```bash
+grep -E "BACKEND" CMakeCache.txt
+```
+
+应该看到：
+```
+BACKEND_DEFINITIONS:UNINITIALIZED=V8_94_OR_NEWER
+BACKEND_INC_NAMES:UNINITIALIZED=/Inc
+BACKEND_LIB_NAMES:UNINITIALIZED=/Lib/Win64/wee8.lib  # 或对应平台的路径
+```
+
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
