@@ -1,0 +1,107 @@
+name: Build iOS Plugins
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend:
+        description: 'JavaScript Backend'
+        type: choice
+        options:
+          - v8_9.4.146.24
+          - v8_9.4
+          - v8_10.6.194
+          - quickjs
+          - nodejs_16
+          - mult
+        default: 'mult'
+      websocket:
+        description: 'WebSocket support level (0: disabled, 1: minimal, 2: WolfSSL, 3: OpenSSL)'
+        required: false
+        default: '2'
+      config:
+        description: 'Build Configuration'
+        type: choice
+        options:
+          - Release
+          - Debug
+        default: 'Release'
+
+env:
+  RUNID: ${{ github.run_id }}
+
+jobs:
+  build-ios:
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          cd unity
+          npm install
+          
+      - name: Download Backend
+        if: github.event.inputs.backend != 'quickjs'
+        shell: bash
+        run: |
+          set -e
+          
+          echo "=== Downloading Backend: ${{ github.event.inputs.backend }} ==="
+          cd unity/native_src
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend }}
+          
+          echo "=== Verifying Backend Download ==="
+          ls -la .backends/
+          
+          BACKEND_VERSION="${{ github.event.inputs.backend }}"
+          
+          if [ ! -d ".backends/${BACKEND_VERSION}" ]; then
+            echo "❌ FATAL: Backend directory not found!"
+            exit 1
+          fi
+          echo "✅ Backend directory exists"
+          
+      - name: Build iOS Plugin
+        uses: ./.github/workflows/composites/unity-build-plugins/ios/
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          backend: ${{ github.event.inputs.backend }}
+          websocket: ${{ github.event.inputs.websocket }}
+          
+      - name: List Build Output
+        shell: bash
+        run: |
+          echo "=== Build Output ==="
+          ls -lh unity/Assets/core/upm/Plugins/iOS/ || echo "iOS plugins directory not found"
+          
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Unity_Plugins_${{ github.event.inputs.backend }}_${{ github.event.inputs.config }}_iOS
+          path: |
+            unity/Assets/core/upm/Plugins/iOS/**
+          retention-days: 30
+          
+      - name: Build Summary
+        shell: bash
+        run: |
+          echo "# 🎉 iOS Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backend**: ${{ github.event.inputs.backend }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Type**: ${{ github.event.inputs.config }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **WebSocket**: ${{ github.event.inputs.websocket }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Build Status" >> $GITHUB_STEP_SUMMARY
+          echo "✅ iOS Build Completed Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "Download the compiled iOS plugins from the Artifacts section above." >> $GITHUB_STEP_SUMMARY

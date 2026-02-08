@@ -34,13 +34,14 @@ on:
           - wolfssl
           - openssl
         default: 'wolfssl'
-  push:
-    branches:
-      - feature/websocket-ssl
-    paths:
-      - unity/native_src/**
-      - .github/workflows/unity_build_websocket_ssl.yml
-      - .github/workflows/composites/unity-build-websocket-ssl/**
+  # Disabled automatic trigger on push - only manual workflow_dispatch
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - unity/native_src/**
+  #     - .github/workflows/unity_build_websocket_ssl.yml
+  #     - .github/workflows/composites/unity-build-websocket-ssl/**
 
 env:
   # WebSocket with SSL support
@@ -52,7 +53,7 @@ jobs:
   # Windows Build Job
   # ============================================
   build-windows:
-    if: github.event.inputs.platform == 'windows' || github.event.inputs.platform == 'all'
+    if: github.event.inputs.platform == 'windows' || github.event.inputs.platform == 'all' || github.event_name == 'push'
     runs-on: windows-2022
     
     steps:
@@ -91,6 +92,69 @@ jobs:
           cd unity
           npm install
           
+      - name: Download V8 Backend
+        shell: bash
+        run: |
+          set -e  # Exit immediately if any command fails
+          
+          echo "=== Current Directory ==="
+          pwd
+          
+          echo "=== Changing to native_src directory ==="
+          cd unity/native_src
+          pwd
+          
+          echo "=== Downloading V8 Backend: ${{ github.event.inputs.backend || 'v8_9.4.146.24' }} ==="
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          
+          echo "=== Download command completed successfully ==="
+          
+      - name: Verify V8 Backend Download
+        shell: bash
+        run: |
+          set -e  # Exit immediately if any command fails
+          
+          cd unity/native_src
+          
+          BACKEND_VERSION="${{ github.event.inputs.backend || 'v8_9.4.146.24' }}"
+          
+          echo "=== Verifying V8 Backend: ${BACKEND_VERSION} ==="
+          
+          # Check .backends directory
+          if [ ! -d ".backends" ]; then
+            echo "❌ FATAL: .backends directory does not exist!"
+            ls -la
+            exit 1
+          fi
+          echo "✅ .backends directory exists"
+          
+          # Check backend version directory
+          if [ ! -d ".backends/${BACKEND_VERSION}" ]; then
+            echo "❌ FATAL: Backend directory .backends/${BACKEND_VERSION} does not exist!"
+            ls -la .backends/
+            exit 1
+          fi
+          echo "✅ Backend directory exists"
+          
+          # Check v8.h
+          if [ ! -f ".backends/${BACKEND_VERSION}/Inc/v8.h" ]; then
+            echo "❌ FATAL: v8.h not found!"
+            ls -la ".backends/${BACKEND_VERSION}/Inc/" || echo "Inc directory does not exist"
+            exit 1
+          fi
+          echo "✅ v8.h found"
+          
+          # Check libplatform/libplatform.h
+          if [ ! -f ".backends/${BACKEND_VERSION}/Inc/libplatform/libplatform.h" ]; then
+            echo "❌ FATAL: libplatform/libplatform.h not found!"
+            ls -la ".backends/${BACKEND_VERSION}/Inc/libplatform/" || echo "libplatform directory does not exist"
+            exit 1
+          fi
+          echo "✅ libplatform/libplatform.h found"
+          
+          echo ""
+          echo "=== ✅ All V8 backend files verified successfully! ==="
+          
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
         shell: bash
@@ -103,31 +167,15 @@ jobs:
           cmake .. \
             -G "Visual Studio 17 2022" -A x64 \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/Win64/wee8.lib \
+            -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=2 \
             -DUSING_MULT_BACKEND=OFF \
             -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
           
           echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
-          
-      - name: Configure CMake (OpenSSL)
-        if: github.event.inputs.ssl_backend == 'openssl'
-        shell: bash
-        run: |
-          cd unity/native_src
-          mkdir -p build_win_x64_v8_ws_openssl
-          cd build_win_x64_v8_ws_openssl
-          
-          echo "=== Configuring CMake with OpenSSL ==="
-          cmake .. \
-            -G "Visual Studio 17 2022" -A x64 \
-            -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DWITH_WEBSOCKET=3 \
-            -DUSING_MULT_BACKEND=OFF \
-            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
-          
-          echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|openssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
+          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
           
       - name: Build Plugin
         shell: bash
@@ -282,6 +330,14 @@ jobs:
           cd unity
           npm install
           
+      - name: Download V8 Backend
+        run: |
+          cd unity/native_src
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          
+          echo "=== Verifying Backend Download ==="
+          ls -la .backends/
+          
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
         run: |
@@ -293,34 +349,20 @@ jobs:
           cmake .. \
             -G "Unix Makefiles" \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/Linux/libwee8.a \
+            -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=2 \
             -DUSING_MULT_BACKEND=OFF \
             -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
           
           echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
-          
-      - name: Configure CMake (OpenSSL)
-        if: github.event.inputs.ssl_backend == 'openssl'
-        run: |
-          cd unity/native_src
-          mkdir -p build_linux_x64_v8_ws_openssl
-          cd build_linux_x64_v8_ws_openssl
-          
-          echo "=== Configuring CMake with OpenSSL ==="
-          cmake .. \
-            -G "Unix Makefiles" \
-            -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
-            -DWITH_WEBSOCKET=3 \
-            -DUSING_MULT_BACKEND=OFF \
-            -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
-          
-          echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|openssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
+          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
           
       - name: Build Plugin
         run: |
           cd unity/native_src
+          
           
           if [ "${{ github.event.inputs.ssl_backend }}" == "openssl" ]; then
             BUILD_DIR="build_linux_x64_v8_ws_openssl"
@@ -423,6 +465,14 @@ jobs:
           cd unity
           npm install
           
+      - name: Download V8 Backend
+        run: |
+          cd unity/native_src
+          node ../cli/cmd.mjs backend download ${{ github.event.inputs.backend || 'v8_9.4.146.24' }}
+          
+          echo "=== Verifying Backend Download ==="
+          ls -la .backends/
+          
       - name: Configure CMake (WolfSSL)
         if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
         run: |
@@ -434,12 +484,15 @@ jobs:
           cmake .. \
             -G "Unix Makefiles" \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/macOS/libwee8.a \
+            -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=2 \
             -DUSING_MULT_BACKEND=OFF \
             -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
           
           echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
+          grep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
           
       - name: Configure CMake (OpenSSL)
         if: github.event.inputs.ssl_backend == 'openssl'
@@ -452,12 +505,14 @@ jobs:
           cmake .. \
             -G "Unix Makefiles" \
             -DJS_ENGINE=${{ github.event.inputs.backend || 'v8_9.4.146.24' }} \
+            -DBACKEND_INC_NAMES=Inc \
+            -DBACKEND_LIB_NAMES=Lib/macOS/libwee8.a \
+            -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \
             -DWITH_WEBSOCKET=3 \
             -DUSING_MULT_BACKEND=OFF \
             -DCMAKE_BUILD_TYPE=${{ github.event.inputs.config || 'Release' }}
-          
           echo "=== Verifying CMake Configuration ==="
-          grep -E "WITH_WEBSOCKET|JS_ENGINE|openssl" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
+          grep -E "WITH_WEBSOCKET|JS_ENGINE|openssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"
           
       - name: Build Plugin
         run: |
