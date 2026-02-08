@@ -593,6 +593,31 @@ BACKEND_LIB_NAMES:UNINITIALIZED=/Lib/Win64/wee8.lib  # 或对应平台的路径
    
    **解决方法**：使用相对路径（不以 `/` 开头）
 
+4. **CMakeLists.txt 路径拼接问题** ⚠️ **已修复**：
+   
+   **问题**：CMakeLists.txt 在拼接 `BACKEND_ROOT` 和 `BACKEND_INC_NAMES` 时，如果参数不以 `/` 开头，会导致路径错误：
+   
+   ```cmake
+   # 错误的拼接结果
+   BACKEND_ROOT = .../v8_9.4.146.24
+   BACKEND_INC_NAMES = Inc
+   结果 = .../v8_9.4.146.24Inc  ❌ 缺少 /
+   ```
+   
+   **症状**：编译时报错 `error C1083: Cannot open include file: 'v8.h'`，即使 V8 后端已正确下载。
+   
+   **解决方法**：已在 CMakeLists.txt 中添加自动路径分隔符处理（Commit `32d36d4`）：
+   ```cmake
+   # 自动添加 / 如果参数不以 / 开头
+   if(NOT BACKEND_INC_NAMES MATCHES "^/")
+       set(BACKEND_INC_NAMES "/${BACKEND_INC_NAMES}")
+   endif()
+   ```
+   
+   现在两种格式都支持：
+   - `-DBACKEND_INC_NAMES=Inc` ✅
+   - `-DBACKEND_INC_NAMES=/Inc` ✅（但在 Git Bash 中会被转换，不推荐）
+
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
