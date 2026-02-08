@@ -560,6 +560,17 @@ BACKEND_INC_NAMES:UNINITIALIZED=/Inc
 BACKEND_LIB_NAMES:UNINITIALIZED=/Lib/Win64/wee8.lib  # 或对应平台的路径
 ```
 
+**常见错误**：
+
+1. **重复的配置步骤**：如果工作流中有多个 "Configure CMake (WolfSSL)" 步骤，只有第一个会执行。确保第一个步骤包含所有必要的参数。
+
+2. **条件判断冲突**：避免使用重复的条件判断，例如：
+   ```yaml
+   # ❌ 错误 - 这两个条件是重复的
+   if: github.event.inputs.ssl_backend == 'wolfssl' || github.event.inputs.ssl_backend == ''
+   if: github.event.inputs.ssl_backend != 'openssl'
+   ```
+
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
