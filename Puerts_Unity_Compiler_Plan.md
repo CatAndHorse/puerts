@@ -428,6 +428,37 @@ A: 这是因为脚本需要在 `native_src` 目录下运行（它会检查 `CMak
 ```
 
 **原因**：`backend.mjs` 脚本会检查当前目录是否包含 `CMakeLists.txt`，如果不存在则抛出错误。
+
+**Q2.2: GitHub Actions 编译时找不到 v8.h 头文件？**
+
+A: 这通常是因为 V8 Backend 下载步骤失败或未正确执行。解决方法：
+
+1. **检查下载步骤日志**：确认是否有 "✅ v8.h header file found" 输出
+2. **验证 .backends 目录**：确保 `unity/native_src/.backends/v8_9.4.146.24/Inc/v8.h` 存在
+3. **检查工作流版本**：确保使用的是最新的工作流文件（不是缓存的旧版本）
+
+**详细验证步骤**：
+
+```yaml
+- name: Download V8 Backend
+  shell: bash
+  run: |
+    cd unity/native_src
+    node ../cli/cmd.mjs backend download v8_9.4.146.24
+    
+    # 验证下载结果
+    if [ -f ".backends/v8_9.4.146.24/Inc/v8.h" ]; then
+      echo "✅ V8 backend downloaded successfully"
+    else
+      echo "❌ ERROR: V8 backend download failed!"
+      exit 1
+    fi
+```
+
+**如果问题持续**：
+- 清除 GitHub Actions 缓存
+- 手动触发新的工作流运行
+- 检查网络连接（V8 backend 从 GitHub Releases 下载）
 **Q3: 如何验证 V8 后端是否正确下载？**
 
 A: 检查以下目录是否存在：
