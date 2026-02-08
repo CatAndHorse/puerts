@@ -34,13 +34,14 @@ on:
           - wolfssl
           - openssl
         default: 'wolfssl'
-  push:
-    branches:
-      - unity-2.2.x
-    paths:
-      - unity/native_src/**
-      - .github/workflows/unity_build_websocket_ssl.yml
-      - .github/workflows/composites/unity-build-websocket-ssl/**
+  # Disabled automatic trigger on push - only manual workflow_dispatch
+  # push:
+  #   branches:
+  #     - unity-2.2.x
+  #   paths:
+  #     - unity/native_src/**
+  #     - .github/workflows/unity_build_websocket_ssl.yml
+  #     - .github/workflows/composites/unity-build-websocket-ssl/**
 
 env:
   # WebSocket with SSL support

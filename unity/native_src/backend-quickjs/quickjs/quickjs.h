@@ -42,6 +42,11 @@ extern "C" {
 #define js_force_inline       inline __attribute__((always_inline))
 #define __js_printf_like(f, a)   __attribute__((format(printf, f, a)))
 #define JS_EXTERN __attribute__((visibility("default")))
+#elif defined(__APPLE__)
+/* iOS/macOS may not define __GNUC__ or __clang__ in some build configurations */
+#define js_force_inline  inline
+#define __js_printf_like(a, b)
+#define JS_EXTERN __attribute__((visibility("default")))
 #else
 #define js_force_inline  inline
 #define __js_printf_like(a, b)
