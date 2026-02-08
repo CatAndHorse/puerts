@@ -422,6 +422,16 @@ A: 工作流已配置为在推送到 `unity-2.2.x` 分支时自动触发，监�
 - `.github/workflows/unity_build_websocket_ssl.yml`
 - `.github/workflows/composites/unity-build-websocket-ssl/**`
 
+**自动触发行为**：
+- ✅ **Push 触发时默认编译 Windows x64 平台**（最常用的平台）
+- ✅ 使用默认配置：V8 9.4.146.24 + WolfSSL + Release 模式
+- ✅ 手动触发时可以选择任意平台（Windows/Linux/macOS/All）
+
+**为什么只自动编译 Windows？**
+- Windows 是最常用的开发和部署平台
+- 减少 CI 资源消耗和构建时间
+- Linux 和 macOS 可以通过手动触发按需编译
+
 ---
 
 **文档结束**
