@@ -1,0 +1,23 @@
+﻿2026-02-08T04:42:31.1420562Z ##[group]Run cd unity
+2026-02-08T04:42:31.1421048Z [36;1mcd unity[0m
+2026-02-08T04:42:31.1421232Z [36;1mnpm install[0m
+2026-02-08T04:42:31.1439468Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-02-08T04:42:31.1439831Z env:
+2026-02-08T04:42:31.1439979Z   WEBSOCKET_MODE: 2
+2026-02-08T04:42:31.1440149Z ##[endgroup]
+2026-02-08T04:42:33.7479925Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-02-08T04:42:33.8416410Z npm warn deprecated @types/iconv-lite@0.0.1: This is a stub types definition for iconv-lite (https://github.com/ashtuchkin/iconv-lite). iconv-lite provides its own type definitions, so you don\'t need @types/iconv-lite installed!
+2026-02-08T04:42:33.8753326Z npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2026-02-08T04:42:33.9285868Z npm warn deprecated glob@8.1.0: Glob versions prior to v9 are no longer supported
+2026-02-08T04:42:34.9811518Z 
+2026-02-08T04:42:34.9812262Z added 88 packages, and audited 89 packages in 3s
+2026-02-08T04:42:34.9812651Z 
+2026-02-08T04:42:34.9812858Z 22 packages are looking for funding
+2026-02-08T04:42:34.9813283Z   run `npm fund` for details
+2026-02-08T04:42:34.9868067Z 
+2026-02-08T04:42:34.9869090Z 6 vulnerabilities (1 low, 4 high, 1 critical)
+2026-02-08T04:42:34.9869483Z 
+2026-02-08T04:42:34.9869665Z To address all issues, run:
+2026-02-08T04:42:34.9870056Z   npm audit fix
+2026-02-08T04:42:34.9870234Z 
+2026-02-08T04:42:34.9870405Z Run `npm audit` for details.

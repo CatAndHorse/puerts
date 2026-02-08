@@ -1,0 +1,69 @@
+﻿2026-02-08T04:27:36.3035294Z Current runner version: '2.331.0'
+2026-02-08T04:27:36.3057916Z ##[group]Runner Image Provisioner
+2026-02-08T04:27:36.3058657Z Hosted Compute Agent
+2026-02-08T04:27:36.3059160Z Version: 20260123.484
+2026-02-08T04:27:36.3059706Z Commit: 6bd6555ca37d84114959e1c76d2c01448ff61c5d
+2026-02-08T04:27:36.3060285Z Build Date: 2026-01-23T19:41:17Z
+2026-02-08T04:27:36.3060870Z Worker ID: {e07f3d31-fda3-467a-b696-27ab957ce952}
+2026-02-08T04:27:36.3061488Z Azure Region: westcentralus
+2026-02-08T04:27:36.3061996Z ##[endgroup]
+2026-02-08T04:27:36.3063281Z ##[group]Operating System
+2026-02-08T04:27:36.3063783Z Ubuntu
+2026-02-08T04:27:36.3064207Z 24.04.3
+2026-02-08T04:27:36.3064582Z LTS
+2026-02-08T04:27:36.3065052Z ##[endgroup]
+2026-02-08T04:27:36.3065454Z ##[group]Runner Image
+2026-02-08T04:27:36.3066342Z Image: ubuntu-24.04
+2026-02-08T04:27:36.3066803Z Version: 20260201.15.1
+2026-02-08T04:27:36.3067855Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260201.15/images/ubuntu/Ubuntu2404-Readme.md
+2026-02-08T04:27:36.3069130Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260201.15
+2026-02-08T04:27:36.3069910Z ##[endgroup]
+2026-02-08T04:27:36.3072265Z ##[group]GITHUB_TOKEN Permissions
+2026-02-08T04:27:36.3074129Z Actions: write
+2026-02-08T04:27:36.3074566Z ArtifactMetadata: write
+2026-02-08T04:27:36.3075127Z Attestations: write
+2026-02-08T04:27:36.3075542Z Checks: write
+2026-02-08T04:27:36.3076107Z Contents: write
+2026-02-08T04:27:36.3076571Z Deployments: write
+2026-02-08T04:27:36.3076986Z Discussions: write
+2026-02-08T04:27:36.3077436Z Issues: write
+2026-02-08T04:27:36.3077872Z Metadata: read
+2026-02-08T04:27:36.3078314Z Models: read
+2026-02-08T04:27:36.3078708Z Packages: write
+2026-02-08T04:27:36.3079155Z Pages: write
+2026-02-08T04:27:36.3079680Z PullRequests: write
+2026-02-08T04:27:36.3080135Z RepositoryProjects: write
+2026-02-08T04:27:36.3080676Z SecurityEvents: write
+2026-02-08T04:27:36.3081130Z Statuses: write
+2026-02-08T04:27:36.3081589Z ##[endgroup]
+2026-02-08T04:27:36.3083512Z Secret source: Actions
+2026-02-08T04:27:36.3084207Z Prepare workflow directory
+2026-02-08T04:27:36.3492986Z Prepare all required actions
+2026-02-08T04:27:36.3543313Z Complete job name: build-summary
+2026-02-08T04:27:36.4236890Z ##[group]Run echo "# 🎉 Puerts WebSocket SSL Build Summary" >> $GITHUB_STEP_SUMMARY
+2026-02-08T04:27:36.4238718Z [36;1mecho "# 🎉 Puerts WebSocket SSL Build Summary" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4240021Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4241103Z [36;1mecho "## Configuration" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4242332Z [36;1mecho "- **Backend**: v8_9.4.146.24" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4243717Z [36;1mecho "- **Platform**: windows" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4245016Z [36;1mecho "- **Build Type**: Release" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4246398Z [36;1mecho "- **SSL Backend**: wolfssl" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4247920Z [36;1mecho "- **WebSocket Mode**: WITH_WEBSOCKET=2" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4249230Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4251045Z [36;1mecho "## Build Status" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4252207Z [36;1mecho "- Windows: failure" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4253345Z [36;1mecho "- Linux: skipped" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4254589Z [36;1mecho "- macOS: skipped" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4255621Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4256851Z [36;1mecho "## Features" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4258169Z [36;1mecho "✅ WebSocket Support (ws://)" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4259636Z [36;1mecho "✅ WebSocket Secure Support (wss://)" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4261032Z [36;1mecho "✅ TLS/SSL Encryption" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4262173Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4263450Z [36;1mecho "## Artifacts" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4264947Z [36;1mecho "Download the compiled plugins from the Artifacts section above." >> $GITHUB_STEP_SUMMARY[0m
+2026-02-08T04:27:36.4711782Z shell: /usr/bin/bash -e {0}
+2026-02-08T04:27:36.4713271Z env:
+2026-02-08T04:27:36.4714036Z   WEBSOCKET_MODE: 2
+2026-02-08T04:27:36.4714724Z ##[endgroup]
+2026-02-08T04:27:36.5074710Z Cleaning up orphan processes

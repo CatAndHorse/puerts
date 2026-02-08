@@ -1,0 +1,18 @@
+﻿2026-02-08T04:25:00.8669868Z ##[group]Run actions/setup-node@v4
+2026-02-08T04:25:00.8670203Z with:
+2026-02-08T04:25:00.8670396Z   node-version: 18
+2026-02-08T04:25:00.8670582Z   always-auth: false
+2026-02-08T04:25:00.8670778Z   check-latest: false
+2026-02-08T04:25:00.8671112Z   token: ***
+2026-02-08T04:25:00.8671277Z env:
+2026-02-08T04:25:00.8671424Z   WEBSOCKET_MODE: 2
+2026-02-08T04:25:00.8671588Z ##[endgroup]
+2026-02-08T04:25:01.1282659Z Attempting to download 18...
+2026-02-08T04:25:02.1034332Z Acquiring 18.20.8 - x64 from https://github.com/actions/node-versions/releases/download/18.20.8-14110393767/node-18.20.8-win32-x64.7z
+2026-02-08T04:25:02.5408325Z Extracting ...
+2026-02-08T04:25:04.2188864Z Adding to the cache ...
+2026-02-08T04:25:07.5116994Z ##[group]Environment details
+2026-02-08T04:25:08.4950412Z node: v18.20.8
+2026-02-08T04:25:08.4950687Z npm: 10.8.2
+2026-02-08T04:25:08.4950973Z yarn: 1.22.22
+2026-02-08T04:25:08.4952257Z ##[endgroup]

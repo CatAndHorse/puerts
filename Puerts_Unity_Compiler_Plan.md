@@ -371,7 +371,8 @@ A: 支持，需要使用相应的编译器和工具链，本文档仅针对 Wind
 - 🚀 [5分钟快速启动](.github/workflows/composites/unity-build-websocket-ssl/QUICKSTART.md)
 - 📘 [完整使用文档](.github/workflows/composites/unity-build-websocket-ssl/README.md)
 - 🔍 [故障排查清单](.github/workflows/composites/unity-build-websocket-ssl/TROUBLESHOOTING.md)
-- 📊 [项目总结](.github/workflows/composites/unity-build-websocket-ssl/PROJECT_SUMMARY.md)
+- � [关键修复：V8 头文件找不到问题](.github/workflows/composites/unity-build-websocket-ssl/CRITICAL_FIX_V8_HEADERS.md) ⭐ **重要**
+- �📊 [项目总结](.github/workflows/composites/unity-build-websocket-ssl/PROJECT_SUMMARY.md)
 
 #### 推荐使用场景
 

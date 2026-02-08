@@ -1,0 +1,8 @@
+2026-02-08T04:13:58.7840000Z Requested labels: ubuntu-latest
+2026-02-08T04:13:58.7840000Z Job defined at: CatAndHorse/puerts/.github/workflows/unity_build_websocket_ssl.yml@refs/heads/unity-2.2.x
+2026-02-08T04:13:58.7840000Z Waiting for a runner to pick up this job...
+2026-02-08T04:13:58.7830000Z Evaluating build-summary.if
+2026-02-08T04:13:58.7830000Z Evaluating: always()
+2026-02-08T04:13:58.7830000Z Result: true
+2026-02-08T04:13:59.0550000Z Job is waiting for a hosted runner to come online.
+2026-02-08T04:13:59.0560000Z Job is about to start running on the hosted runner: GitHub Actions 1000000223

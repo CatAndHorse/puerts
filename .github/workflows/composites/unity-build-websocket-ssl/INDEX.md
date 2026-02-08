@@ -52,6 +52,26 @@
 
 ---
 
+### 🔧 [关键修复：V8 头文件找不到问题](./CRITICAL_FIX_V8_HEADERS.md) ⭐ **重要**
+
+详细记录了 GitHub Actions 中 V8 头文件找不到问题的完整解决过程。
+
+**适合以下情况**：
+- 遇到 `Cannot open include file: 'v8.h'` 错误
+- V8 Backend 下载成功但编译失败
+- 需要了解 CMakeLists.txt 路径拼接问题
+- 需要了解 Git Bash 路径转换问题
+
+**包含内容**：
+- 问题症状和根本原因分析
+- 完整的问题排查过程（5 次尝试）
+- CMakeLists.txt 修复方案
+- Git Bash 路径转换问题说明
+- 验证修复的方法
+- 关键教训总结
+
+---
+
 ### 📊 [项目总结](./PROJECT_SUMMARY.md)
 
 项目概览、技术细节和维护指南。
@@ -98,6 +118,14 @@
 
 ---
 
+### 场景 3.1：遇到 "Cannot open include file: 'v8.h'" 错误
+
+👉 阅读 **[CRITICAL_FIX_V8_HEADERS.md](./CRITICAL_FIX_V8_HEADERS.md)** ⭐
+
+这是一个已知问题，文档中有详细的解决方案。
+
+---
+
 ### 场景 4：我想了解这个系统是如何工作的
 
 👉 阅读 **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)**
@@ -130,6 +158,7 @@
 - 📋 [快速启动指南](./QUICKSTART.md)
 - 📖 [完整文档](./README.md)
 - 🔍 [故障排查](./TROUBLESHOOTING.md)
+- 🔧 [关键修复：V8 头文件](./CRITICAL_FIX_V8_HEADERS.md) ⭐
 - 📊 [项目总结](./PROJECT_SUMMARY.md)
 
 ### 外部资源
@@ -150,6 +179,7 @@ unity-build-websocket-ssl/
 ├── QUICKSTART.md               # 5 分钟快速启动
 ├── README.md                   # 完整使用文档
 ├── TROUBLESHOOTING.md          # 故障排查清单
+├── CRITICAL_FIX_V8_HEADERS.md  # 关键修复：V8 头文件问题 ⭐
 └── PROJECT_SUMMARY.md          # 项目总结
 ```
 
@@ -221,5 +251,5 @@ unity-build-websocket-ssl/
 
 ---
 
-**最后更新**：2026-02-07  
-**版本**：1.0.0
+**最后更新**：2026-02-08  
+**版本**：1.1.0

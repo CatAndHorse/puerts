@@ -1,0 +1,28 @@
+﻿2026-02-08T04:11:42.8140159Z ##[group]Run set -e  # Exit immediately if any command fails
+2026-02-08T04:11:42.8140706Z [36;1mset -e  # Exit immediately if any command fails[0m
+2026-02-08T04:11:42.8140976Z [36;1m[0m
+2026-02-08T04:11:42.8141139Z [36;1mecho "=== Current Directory ==="[0m
+2026-02-08T04:11:42.8141364Z [36;1mpwd[0m
+2026-02-08T04:11:42.8141530Z [36;1m[0m
+2026-02-08T04:11:42.8141734Z [36;1mecho "=== Changing to native_src directory ==="[0m
+2026-02-08T04:11:42.8142000Z [36;1mcd unity/native_src[0m
+2026-02-08T04:11:42.8142199Z [36;1mpwd[0m
+2026-02-08T04:11:42.8142342Z [36;1m[0m
+2026-02-08T04:11:42.8142542Z [36;1mecho "=== Downloading V8 Backend: v8_9.4.146.24 ==="[0m
+2026-02-08T04:11:42.8142872Z [36;1mnode ../cli/cmd.mjs backend download v8_9.4.146.24[0m
+2026-02-08T04:11:42.8143121Z [36;1m[0m
+2026-02-08T04:11:42.8143332Z [36;1mecho "=== Download command completed successfully ==="[0m
+2026-02-08T04:11:42.8153718Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-02-08T04:11:42.8154113Z env:
+2026-02-08T04:11:42.8154266Z   WEBSOCKET_MODE: 2
+2026-02-08T04:11:42.8154431Z ##[endgroup]
+2026-02-08T04:11:42.8426886Z === Current Directory ===
+2026-02-08T04:11:42.8427417Z /d/a/puerts/puerts
+2026-02-08T04:11:42.8427834Z === Changing to native_src directory ===
+2026-02-08T04:11:42.8430740Z /d/a/puerts/puerts/unity/native_src
+2026-02-08T04:11:42.8431345Z === Downloading V8 Backend: v8_9.4.146.24 ===
+2026-02-08T04:11:43.2806859Z CHCP 65001
+2026-02-08T04:11:43.3718942Z [Puer] downloading v8_9.4.146.24 from https://github.com/puerts/backend-v8/releases/download/V8_9.4.146.24__241009/v8_bin_9.4.146.24.tgz
+2026-02-08T04:11:46.7985345Z 
+2026-02-08T04:11:55.8876766Z Downloaded and extracted to D:\a\puerts\puerts\unity\native_src\.backends
+2026-02-08T04:11:55.9113749Z === Download command completed successfully ===

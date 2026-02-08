@@ -1,0 +1,78 @@
+﻿2026-02-08T04:24:52.5285863Z ##[group]Run actions/checkout@v4
+2026-02-08T04:24:52.5287123Z with:
+2026-02-08T04:24:52.5287616Z   submodules: recursive
+2026-02-08T04:24:52.5288202Z   repository: CatAndHorse/puerts
+2026-02-08T04:24:52.5289044Z   token: ***
+2026-02-08T04:24:52.5289534Z   ssh-strict: true
+2026-02-08T04:24:52.5290053Z   ssh-user: git
+2026-02-08T04:24:52.5290552Z   persist-credentials: true
+2026-02-08T04:24:52.5291129Z   clean: true
+2026-02-08T04:24:52.5291582Z   sparse-checkout-cone-mode: true
+2026-02-08T04:24:52.5292062Z   fetch-depth: 1
+2026-02-08T04:24:52.5292450Z   fetch-tags: false
+2026-02-08T04:24:52.5292852Z   show-progress: true
+2026-02-08T04:24:52.5293244Z   lfs: false
+2026-02-08T04:24:52.5293622Z   set-safe-directory: true
+2026-02-08T04:24:52.5294250Z env:
+2026-02-08T04:24:52.5294620Z   WEBSOCKET_MODE: 2
+2026-02-08T04:24:52.5295016Z ##[endgroup]
+2026-02-08T04:24:52.6858693Z Syncing repository: CatAndHorse/puerts
+2026-02-08T04:24:52.6861024Z ##[group]Getting Git version info
+2026-02-08T04:24:52.6861756Z Working directory is 'D:\a\puerts\puerts'
+2026-02-08T04:24:52.7984506Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-02-08T04:24:53.1203752Z git version 2.52.0.windows.1
+2026-02-08T04:24:53.1250684Z ##[endgroup]
+2026-02-08T04:24:53.1270300Z Temporarily overriding HOME='D:\a\_temp\05664278-82a9-48db-b45e-1a5d419e6e0f' before making global git config changes
+2026-02-08T04:24:53.1274283Z Adding repository directory to the temporary git global config as a safe directory
+2026-02-08T04:24:53.1282085Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\puerts\puerts
+2026-02-08T04:24:53.1737527Z Deleting the contents of 'D:\a\puerts\puerts'
+2026-02-08T04:24:53.1743404Z ##[group]Initializing the repository
+2026-02-08T04:24:53.1753743Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\puerts\puerts
+2026-02-08T04:24:53.2509346Z Initialized empty Git repository in D:/a/puerts/puerts/.git/
+2026-02-08T04:24:53.2548520Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/CatAndHorse/puerts
+2026-02-08T04:24:53.2971695Z ##[endgroup]
+2026-02-08T04:24:53.2974975Z ##[group]Disabling automatic garbage collection
+2026-02-08T04:24:53.2978021Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-02-08T04:24:53.3266595Z ##[endgroup]
+2026-02-08T04:24:53.3269079Z ##[group]Setting up auth
+2026-02-08T04:24:53.3282017Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-02-08T04:24:53.3529043Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-02-08T04:24:54.5850249Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-02-08T04:24:54.6085780Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-02-08T04:24:55.0338433Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-02-08T04:24:55.0580234Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-02-08T04:24:55.4886510Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-02-08T04:24:55.5133514Z ##[endgroup]
+2026-02-08T04:24:55.5134068Z ##[group]Fetching the repository
+2026-02-08T04:24:55.5153275Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ed84335005beeb3e0f47b1bbf6b3a9eee7606df1:refs/remotes/origin/unity-2.2.x
+2026-02-08T04:24:57.2597464Z From https://github.com/CatAndHorse/puerts
+2026-02-08T04:24:57.2601157Z  * [new ref]         ed84335005beeb3e0f47b1bbf6b3a9eee7606df1 -> origin/unity-2.2.x
+2026-02-08T04:24:57.2848939Z ##[endgroup]
+2026-02-08T04:24:57.2849446Z ##[group]Determining the checkout info
+2026-02-08T04:24:57.2852865Z ##[endgroup]
+2026-02-08T04:24:57.2868399Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-02-08T04:24:57.3254644Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-02-08T04:24:57.3544909Z ##[group]Checking out the ref
+2026-02-08T04:24:57.3555610Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B unity-2.2.x refs/remotes/origin/unity-2.2.x
+2026-02-08T04:24:57.7162445Z branch 'unity-2.2.x' set up to track 'origin/unity-2.2.x'.
+2026-02-08T04:24:57.7168432Z Switched to a new branch 'unity-2.2.x'
+2026-02-08T04:24:57.7204683Z ##[endgroup]
+2026-02-08T04:24:57.7205205Z ##[group]Setting up auth for fetching submodules
+2026-02-08T04:24:57.7214495Z [command]"C:\Program Files\Git\bin\git.exe" config --global http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-02-08T04:24:57.7451411Z [command]"C:\Program Files\Git\bin\git.exe" config --global --unset-all url.https://github.com/.insteadOf
+2026-02-08T04:24:57.7671518Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf git@github.com:
+2026-02-08T04:24:57.7896044Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add url.https://github.com/.insteadOf org-4027330@github.com:
+2026-02-08T04:24:57.8117181Z ##[endgroup]
+2026-02-08T04:24:57.8117673Z ##[group]Fetching submodules
+2026-02-08T04:24:57.8126322Z [command]"C:\Program Files\Git\bin\git.exe" submodule sync --recursive
+2026-02-08T04:24:58.2517754Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2026-02-08T04:24:58.6597470Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local gc.auto 0"
+2026-02-08T04:24:59.0627023Z ##[endgroup]
+2026-02-08T04:24:59.0627444Z ##[group]Persisting credentials for submodules
+2026-02-08T04:24:59.0638215Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :\""
+2026-02-08T04:24:59.4714052Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url\""
+2026-02-08T04:24:59.8793321Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'"
+2026-02-08T04:25:00.3369303Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --add 'url.https://github.com/.insteadOf' 'org-4027330@github.com:'"
+2026-02-08T04:25:00.7705867Z ##[endgroup]
+2026-02-08T04:25:00.8088450Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-02-08T04:25:00.8299890Z ed84335005beeb3e0f47b1bbf6b3a9eee7606df1

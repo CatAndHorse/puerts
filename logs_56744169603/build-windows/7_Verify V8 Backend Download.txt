@@ -1,0 +1,54 @@
+﻿2026-02-08T04:34:41.5029972Z ##[group]Run set -e  # Exit immediately if any command fails
+2026-02-08T04:34:41.5030492Z [36;1mset -e  # Exit immediately if any command fails[0m
+2026-02-08T04:34:41.5030772Z [36;1m[0m
+2026-02-08T04:34:41.5030939Z [36;1mcd unity/native_src[0m
+2026-02-08T04:34:41.5031132Z [36;1m[0m
+2026-02-08T04:34:41.5031299Z [36;1mBACKEND_VERSION="v8_9.4.146.24"[0m
+2026-02-08T04:34:41.5031534Z [36;1m[0m
+2026-02-08T04:34:41.5031785Z [36;1mecho "=== Verifying V8 Backend: ${BACKEND_VERSION} ==="[0m
+2026-02-08T04:34:41.5032086Z [36;1m[0m
+2026-02-08T04:34:41.5032248Z [36;1m# Check .backends directory[0m
+2026-02-08T04:34:41.5032487Z [36;1mif [ ! -d ".backends" ]; then[0m
+2026-02-08T04:34:41.5032795Z [36;1m  echo "❌ FATAL: .backends directory does not exist!"[0m
+2026-02-08T04:34:41.5033108Z [36;1m  ls -la[0m
+2026-02-08T04:34:41.5033276Z [36;1m  exit 1[0m
+2026-02-08T04:34:41.5033438Z [36;1mfi[0m
+2026-02-08T04:34:41.5033624Z [36;1mecho "✅ .backends directory exists"[0m
+2026-02-08T04:34:41.5033890Z [36;1m[0m
+2026-02-08T04:34:41.5034063Z [36;1m# Check backend version directory[0m
+2026-02-08T04:34:41.5034356Z [36;1mif [ ! -d ".backends/${BACKEND_VERSION}" ]; then[0m
+2026-02-08T04:34:41.5034773Z [36;1m  echo "❌ FATAL: Backend directory .backends/${BACKEND_VERSION} does not exist!"[0m
+2026-02-08T04:34:41.5035173Z [36;1m  ls -la .backends/[0m
+2026-02-08T04:34:41.5035366Z [36;1m  exit 1[0m
+2026-02-08T04:34:41.5035712Z [36;1mfi[0m
+2026-02-08T04:34:41.5035884Z [36;1mecho "✅ Backend directory exists"[0m
+2026-02-08T04:34:41.5036116Z [36;1m[0m
+2026-02-08T04:34:41.5036254Z [36;1m# Check v8.h[0m
+2026-02-08T04:34:41.5036512Z [36;1mif [ ! -f ".backends/${BACKEND_VERSION}/Inc/v8.h" ]; then[0m
+2026-02-08T04:34:41.5036822Z [36;1m  echo "❌ FATAL: v8.h not found!"[0m
+2026-02-08T04:34:41.5037190Z [36;1m  ls -la ".backends/${BACKEND_VERSION}/Inc/" || echo "Inc directory does not exist"[0m
+2026-02-08T04:34:41.5037562Z [36;1m  exit 1[0m
+2026-02-08T04:34:41.5037709Z [36;1mfi[0m
+2026-02-08T04:34:41.5037875Z [36;1mecho "✅ v8.h found"[0m
+2026-02-08T04:34:41.5038066Z [36;1m[0m
+2026-02-08T04:34:41.5038245Z [36;1m# Check libplatform/libplatform.h[0m
+2026-02-08T04:34:41.5038605Z [36;1mif [ ! -f ".backends/${BACKEND_VERSION}/Inc/libplatform/libplatform.h" ]; then[0m
+2026-02-08T04:34:41.5039040Z [36;1m  echo "❌ FATAL: libplatform/libplatform.h not found!"[0m
+2026-02-08T04:34:41.5039545Z [36;1m  ls -la ".backends/${BACKEND_VERSION}/Inc/libplatform/" || echo "libplatform directory does not exist"[0m
+2026-02-08T04:34:41.5039986Z [36;1m  exit 1[0m
+2026-02-08T04:34:41.5040143Z [36;1mfi[0m
+2026-02-08T04:34:41.5040323Z [36;1mecho "✅ libplatform/libplatform.h found"[0m
+2026-02-08T04:34:41.5040572Z [36;1m[0m
+2026-02-08T04:34:41.5040710Z [36;1mecho ""[0m
+2026-02-08T04:34:41.5040958Z [36;1mecho "=== ✅ All V8 backend files verified successfully! ==="[0m
+2026-02-08T04:34:41.5052230Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-02-08T04:34:41.5052620Z env:
+2026-02-08T04:34:41.5052770Z   WEBSOCKET_MODE: 2
+2026-02-08T04:34:41.5052948Z ##[endgroup]
+2026-02-08T04:34:41.5332822Z === Verifying V8 Backend: v8_9.4.146.24 ===
+2026-02-08T04:34:41.5334938Z ✅ .backends directory exists
+2026-02-08T04:34:41.5336770Z ✅ Backend directory exists
+2026-02-08T04:34:41.5338740Z ✅ v8.h found
+2026-02-08T04:34:41.5340699Z ✅ libplatform/libplatform.h found
+2026-02-08T04:34:41.5341048Z 
+2026-02-08T04:34:41.5341875Z === ✅ All V8 backend files verified successfully! ===

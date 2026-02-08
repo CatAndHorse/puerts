@@ -1,0 +1,42 @@
+﻿2026-02-08T04:36:54.4337583Z Current runner version: '2.331.0'
+2026-02-08T04:36:54.4372669Z ##[group]Runner Image Provisioner
+2026-02-08T04:36:54.4373769Z Hosted Compute Agent
+2026-02-08T04:36:54.4374591Z Version: 20260123.484
+2026-02-08T04:36:54.4375681Z Commit: 6bd6555ca37d84114959e1c76d2c01448ff61c5d
+2026-02-08T04:36:54.4376965Z Build Date: 2026-01-23T19:41:17Z
+2026-02-08T04:36:54.4378083Z Worker ID: {93f6f10a-357e-42f4-903e-38a2e3b1e7c8}
+2026-02-08T04:36:54.4379300Z Azure Region: eastus2
+2026-02-08T04:36:54.4380182Z ##[endgroup]
+2026-02-08T04:36:54.4382192Z ##[group]Operating System
+2026-02-08T04:36:54.4383296Z Ubuntu
+2026-02-08T04:36:54.4383962Z 24.04.3
+2026-02-08T04:36:54.4384643Z LTS
+2026-02-08T04:36:54.4385551Z ##[endgroup]
+2026-02-08T04:36:54.4386487Z ##[group]Runner Image
+2026-02-08T04:36:54.4387474Z Image: ubuntu-24.04
+2026-02-08T04:36:54.4388217Z Version: 20260201.15.1
+2026-02-08T04:36:54.4389814Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260201.15/images/ubuntu/Ubuntu2404-Readme.md
+2026-02-08T04:36:54.4392542Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260201.15
+2026-02-08T04:36:54.4394068Z ##[endgroup]
+2026-02-08T04:36:54.4398458Z ##[group]GITHUB_TOKEN Permissions
+2026-02-08T04:36:54.4401283Z Actions: write
+2026-02-08T04:36:54.4402090Z ArtifactMetadata: write
+2026-02-08T04:36:54.4402992Z Attestations: write
+2026-02-08T04:36:54.4403831Z Checks: write
+2026-02-08T04:36:54.4404636Z Contents: write
+2026-02-08T04:36:54.4405343Z Deployments: write
+2026-02-08T04:36:54.4406485Z Discussions: write
+2026-02-08T04:36:54.4407209Z Issues: write
+2026-02-08T04:36:54.4408018Z Metadata: read
+2026-02-08T04:36:54.4408916Z Models: read
+2026-02-08T04:36:54.4409624Z Packages: write
+2026-02-08T04:36:54.4410333Z Pages: write
+2026-02-08T04:36:54.4411986Z PullRequests: write
+2026-02-08T04:36:54.4412850Z RepositoryProjects: write
+2026-02-08T04:36:54.4413670Z SecurityEvents: write
+2026-02-08T04:36:54.4414519Z Statuses: write
+2026-02-08T04:36:54.4415298Z ##[endgroup]
+2026-02-08T04:36:54.4418342Z Secret source: Actions
+2026-02-08T04:36:54.4419895Z Prepare workflow directory
+2026-02-08T04:36:54.4956837Z Prepare all required actions
+2026-02-08T04:36:54.5030771Z Complete job name: build-summary

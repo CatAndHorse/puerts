@@ -1,0 +1,49 @@
+﻿2026-02-08T04:27:06.3765603Z ##[group]Run cd unity/native_src
+2026-02-08T04:27:06.3765963Z [36;1mcd unity/native_src[0m
+2026-02-08T04:27:06.3766290Z [36;1mmkdir -p build_win_x64_v8_ws_wolfssl[0m
+2026-02-08T04:27:06.3766565Z [36;1mcd build_win_x64_v8_ws_wolfssl[0m
+2026-02-08T04:27:06.3766799Z [36;1m[0m
+2026-02-08T04:27:06.3767011Z [36;1mecho "=== Configuring CMake with WolfSSL ==="[0m
+2026-02-08T04:27:06.3767295Z [36;1mcmake .. \[0m
+2026-02-08T04:27:06.3767507Z [36;1m  -G "Visual Studio 17 2022" -A x64 \[0m
+2026-02-08T04:27:06.3767782Z [36;1m  -DJS_ENGINE=v8_9.4.146.24 \[0m
+2026-02-08T04:27:06.3768024Z [36;1m  -DBACKEND_INC_NAMES=/Inc \[0m
+2026-02-08T04:27:06.3768313Z [36;1m  -DBACKEND_LIB_NAMES=/Lib/Win64/wee8.lib \[0m
+2026-02-08T04:27:06.3768610Z [36;1m  -DBACKEND_DEFINITIONS=V8_94_OR_NEWER \[0m
+2026-02-08T04:27:06.3768872Z [36;1m  -DWITH_WEBSOCKET=2 \[0m
+2026-02-08T04:27:06.3769091Z [36;1m  -DUSING_MULT_BACKEND=OFF \[0m
+2026-02-08T04:27:06.3769318Z [36;1m  -DCMAKE_BUILD_TYPE=Release[0m
+2026-02-08T04:27:06.3769552Z [36;1m[0m
+2026-02-08T04:27:06.3769747Z [36;1mecho "=== Verifying CMake Configuration ==="[0m
+2026-02-08T04:27:06.3770318Z [36;1mgrep -E "WITH_WEBSOCKET|JS_ENGINE|wolfssl|BACKEND" CMakeCache.txt || echo "Warning: Configuration may be incomplete"          [0m
+2026-02-08T04:27:06.3781802Z shell: C:\Program Files\Git\bin\bash.EXE --noprofile --norc -e -o pipefail {0}
+2026-02-08T04:27:06.3782183Z env:
+2026-02-08T04:27:06.3782331Z   WEBSOCKET_MODE: 2
+2026-02-08T04:27:06.3782509Z ##[endgroup]
+2026-02-08T04:27:06.4191673Z === Configuring CMake with WolfSSL ===
+2026-02-08T04:27:06.4624240Z -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.20348.
+2026-02-08T04:27:07.7003020Z -- Looking for WOLFSSL_EXPERIMENTAL
+2026-02-08T04:27:07.7003745Z -- Looking for WOLFSSL_EXPERIMENTAL - not found
+2026-02-08T04:27:07.7061135Z -- Generating user options header...
+2026-02-08T04:27:07.7074451Z -- Static Libs: wolfcrypt/src/hmac.c;wolfcrypt/src/hash.c;wolfcrypt/src/cpuid.c;wolfcrypt/src/kdf.c;wolfcrypt/src/random.c;wolfcrypt/src/sha256.c;wolfcrypt/src/rsa.c;wolfcrypt/src/sp_int.c;wolfcrypt/src/aes.c;wolfcrypt/src/sha.c;wolfcrypt/src/sha512.c;wolfcrypt/src/sha3.c;wolfcrypt/src/logging.c;wolfcrypt/src/wc_port.c;wolfcrypt/src/error.c;wolfcrypt/src/wc_encrypt.c;wolfcrypt/src/signature.c;wolfcrypt/src/wolfmath.c;wolfcrypt/src/memory.c;wolfcrypt/src/dh.c;wolfcrypt/src/asn.c;wolfcrypt/src/coding.c;wolfcrypt/src/poly1305.c;wolfcrypt/src/md5.c;wolfcrypt/src/pwdbased.c;wolfcrypt/src/pkcs12.c;wolfcrypt/src/chacha.c;wolfcrypt/src/chacha20_poly1305.c;wolfcrypt/src/integer.c;wolfcrypt/src/ecc.c;src/internal.c;src/wolfio.c;src/keys.c;src/ssl.c;src/ocsp.c;src/tls.c;src/tls13.c
+2026-02-08T04:27:07.7092549Z -- WOLFSSL_INCLUDE_DIRS is blank. No additional directories will be added.
+2026-02-08T04:27:07.7162453Z -- Configuring done (1.3s)
+2026-02-08T04:27:07.7594572Z -- Generating done (0.0s)
+2026-02-08T04:27:07.7606345Z -- Build files have been written to: D:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl
+2026-02-08T04:27:07.7676186Z === Verifying CMake Configuration ===
+2026-02-08T04:27:07.7833686Z # For build in directory: d:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl
+2026-02-08T04:27:07.7834737Z BACKEND_DEFINITIONS:UNINITIALIZED=V8_94_OR_NEWER
+2026-02-08T04:27:07.7835452Z BACKEND_INC_NAMES:UNINITIALIZED=C:/Program Files/Git/Inc
+2026-02-08T04:27:07.7836276Z BACKEND_LIB_NAMES:UNINITIALIZED=C:/Program Files/Git/Lib/Win64/wee8.lib
+2026-02-08T04:27:07.7837635Z CMAKE_FIND_PACKAGE_REDIRECTS_DIR:STATIC=D:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl/CMakeFiles/pkgRedirects
+2026-02-08T04:27:07.7840322Z FETCHCONTENT_BASE_DIR:PATH=D:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl/_deps
+2026-02-08T04:27:07.7841341Z // for wolfssl
+2026-02-08T04:27:07.7842538Z //Enables UPDATE_DISCONNECTED behavior just for population of wolfssl
+2026-02-08T04:27:07.7843347Z JS_ENGINE:UNINITIALIZED=v8_9.4.146.24
+2026-02-08T04:27:07.7844257Z PuertsPlugin_BINARY_DIR:STATIC=D:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl
+2026-02-08T04:27:07.7848097Z USING_MULT_BACKEND:UNINITIALIZED=OFF
+2026-02-08T04:27:07.7848612Z WITH_WEBSOCKET:UNINITIALIZED=2
+2026-02-08T04:27:07.7849544Z wolfssl_BINARY_DIR:STATIC=D:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl/_deps/wolfssl-build
+2026-02-08T04:27:07.7850100Z wolfssl_IS_TOP_LEVEL:STATIC=OFF
+2026-02-08T04:27:07.7850640Z wolfssl_SOURCE_DIR:STATIC=D:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl/_deps/wolfssl-src
+2026-02-08T04:27:07.7851377Z CMAKE_CACHEFILE_DIR:INTERNAL=d:/a/puerts/puerts/unity/native_src/build_win_x64_v8_ws_wolfssl
