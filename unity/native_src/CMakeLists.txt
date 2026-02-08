@@ -49,7 +49,7 @@ if("${JS_ENGINE}" MATCHES "^quickjs")
     set(USING_QUICKJS ON)
 endif()
 
-set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/../native_src/.backends/${JS_ENGINE})
+set(BACKEND_ROOT ${PROJECT_SOURCE_DIR}/.backends/${JS_ENGINE})
 
 set(ThirdParty ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/ThirdParty)
 
