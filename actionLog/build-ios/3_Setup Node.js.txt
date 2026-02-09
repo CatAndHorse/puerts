@@ -1,0 +1,19 @@
+﻿2026-02-09T02:26:29.4321040Z ##[group]Run actions/setup-node@v4
+2026-02-09T02:26:29.4321800Z with:
+2026-02-09T02:26:29.4322260Z   node-version: 18
+2026-02-09T02:26:29.4322770Z   always-auth: false
+2026-02-09T02:26:29.4323300Z   check-latest: false
+2026-02-09T02:26:29.4324090Z   token: ***
+2026-02-09T02:26:29.4324560Z env:
+2026-02-09T02:26:29.4325000Z   RUNID: 21810246533
+2026-02-09T02:26:29.4325520Z ##[endgroup]
+2026-02-09T02:26:29.6282260Z Attempting to download 18...
+2026-02-09T02:26:30.2794900Z Acquiring 18.20.8 - arm64 from https://github.com/actions/node-versions/releases/download/18.20.8-14110393767/node-18.20.8-darwin-arm64.tar.gz
+2026-02-09T02:26:30.8554940Z Extracting ...
+2026-02-09T02:26:30.8668770Z [command]/usr/bin/tar xz --strip 1 -C /Users/runner/work/_temp/c95d3e67-bde3-424b-b69d-5baf62ecac66 -f /Users/runner/work/_temp/108efa64-0ebe-477f-bae0-f3514fadc2c6
+2026-02-09T02:26:32.1543930Z Adding to the cache ...
+2026-02-09T02:26:34.6851020Z ##[group]Environment details
+2026-02-09T02:26:35.1082970Z node: v18.20.8
+2026-02-09T02:26:35.1208590Z npm: 10.8.2
+2026-02-09T02:26:35.1309980Z yarn: 1.22.22
+2026-02-09T02:26:35.1410940Z ##[endgroup]

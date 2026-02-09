@@ -1,0 +1,14 @@
+﻿2026-02-09T02:32:32.4128530Z ##[group]Run actions/upload-artifact@v4
+2026-02-09T02:32:32.4128790Z with:
+2026-02-09T02:32:32.4128930Z   name: Unity_Plugins_mult_Release_iOS
+2026-02-09T02:32:32.4129140Z   path: unity/Assets/core/upm/Plugins/iOS/**
+
+2026-02-09T02:32:32.4129350Z   retention-days: 30
+2026-02-09T02:32:32.4129530Z   if-no-files-found: warn
+2026-02-09T02:32:32.4129760Z   compression-level: 6
+2026-02-09T02:32:32.4129950Z   overwrite: false
+2026-02-09T02:32:32.4130110Z   include-hidden-files: false
+2026-02-09T02:32:32.4130280Z env:
+2026-02-09T02:32:32.4130390Z   RUNID: 21810246533
+2026-02-09T02:32:32.4130530Z ##[endgroup]
+2026-02-09T02:32:32.5767370Z ##[warning]No files were found with the provided path: unity/Assets/core/upm/Plugins/iOS/**. No artifacts will be uploaded.

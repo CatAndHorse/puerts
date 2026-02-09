@@ -1,0 +1,9 @@
+﻿2026-02-09T02:32:32.3675090Z ##[group]Run echo "=== Build Output ==="
+2026-02-09T02:32:32.3675400Z [36;1mecho "=== Build Output ==="[0m
+2026-02-09T02:32:32.3675730Z [36;1mls -lh unity/Assets/core/upm/Plugins/iOS/ || echo "iOS plugins directory not found"[0m
+2026-02-09T02:32:32.3736000Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+2026-02-09T02:32:32.3736320Z env:
+2026-02-09T02:32:32.3736480Z   RUNID: 21810246533
+2026-02-09T02:32:32.3736630Z ##[endgroup]
+2026-02-09T02:32:32.4043560Z === Build Output ===
+2026-02-09T02:32:32.4073290Z total 0

@@ -1,0 +1,17 @@
+﻿2026-02-09T02:32:32.5811430Z ##[group]Run echo "# 🎉 iOS Build Summary" >> $GITHUB_STEP_SUMMARY
+2026-02-09T02:32:32.5811840Z [36;1mecho "# 🎉 iOS Build Summary" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5812120Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5812370Z [36;1mecho "## Configuration" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5812650Z [36;1mecho "- **Backend**: mult" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5812950Z [36;1mecho "- **Build Type**: Release" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5813240Z [36;1mecho "- **WebSocket**: 2" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5813530Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5813760Z [36;1mecho "## Build Status" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5814060Z [36;1mecho "✅ iOS Build Completed Successfully" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5814340Z [36;1mecho "" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5814570Z [36;1mecho "## Artifacts" >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5814970Z [36;1mecho "Download the compiled iOS plugins from the Artifacts section above." >> $GITHUB_STEP_SUMMARY[0m
+2026-02-09T02:32:32.5869600Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+2026-02-09T02:32:32.5869870Z env:
+2026-02-09T02:32:32.5870010Z   RUNID: 21810246533
+2026-02-09T02:32:32.5870160Z ##[endgroup]

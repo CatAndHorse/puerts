@@ -303,9 +303,38 @@ endif()
 if ( APPLE )
     if ( IOS )
         set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD)")
-        add_library(puerts STATIC
-           ${PUERTS_SRC} ${PUERTS_INC} ${BEACKEND_QUICKJS_SRC}
-        )
+        # For iOS, we need to include backend sources directly to avoid static library linking issues
+        if ( USING_MULT_BACKEND )
+            set(IOS_BACKEND_SRC)
+            if ( USING_V8 )
+                list(APPEND IOS_BACKEND_SRC
+                    Src/BackendEnv.cpp
+                    Src/JSEngine.cpp
+                    Src/JSFunction.cpp
+                    ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
+                    Src/PluginImpl.cpp
+                    ${PUERTS_BACKEND_SRC}
+                )
+                if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
+                    list(APPEND IOS_BACKEND_SRC
+                       Src/CppObjectMapper.cpp
+                       Src/DataTransfer.cpp
+                       Src/PesapiAddonLoad.cpp
+                       Src/PesapiV8Impl.cpp
+                    )
+                endif()
+            endif()
+            if ( USING_QJS )
+                list(APPEND IOS_BACKEND_SRC ${BEACKEND_QUICKJS_SRC})
+            endif()
+            add_library(puerts STATIC
+               ${PUERTS_SRC} ${PUERTS_INC} ${IOS_BACKEND_SRC}
+            )
+        else()
+            add_library(puerts STATIC
+               ${PUERTS_SRC} ${PUERTS_INC} ${BEACKEND_QUICKJS_SRC}
+            )
+        endif()
 		set_xcode_property (puerts IPHONEOS_DEPLOYMENT_TARGET "7.0" "all")
     else ()
         if ( NOT DEFINED FOR_SILICON )
@@ -454,91 +483,117 @@ endif ()
 
 if ( USING_MULT_BACKEND )
     list(APPEND PUERTS_COMPILE_DEFINITIONS PUERTS_REG_NAMESPACE=puerts)
-    # -------------------begin v8 backend-------------------------
-    if ( USING_V8)
-        set(v8backend_src 
-            Src/BackendEnv.cpp
-            Src/JSEngine.cpp
-            Src/JSFunction.cpp
-            ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
-            Src/PluginImpl.cpp
-            ${PUERTS_BACKEND_SRC}
-        )
-        if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
-            list(APPEND v8backend_src
-               Src/CppObjectMapper.cpp
-               Src/DataTransfer.cpp
-               Src/PesapiAddonLoad.cpp
-               Src/PesapiV8Impl.cpp
+    # For iOS, backend sources are included directly in puerts library
+    if ( NOT IOS )
+        # -------------------begin v8 backend-------------------------
+        if ( USING_V8)
+            set(v8backend_src 
+                Src/BackendEnv.cpp
+                Src/JSEngine.cpp
+                Src/JSFunction.cpp
+                ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
+                Src/PluginImpl.cpp
+                ${PUERTS_BACKEND_SRC}
             )
-        endif()
-        add_library(v8backend STATIC ${v8backend_src})
-        target_include_directories (v8backend PRIVATE "${BACKEND_ROOT}/Inc/v8")
-        target_compile_definitions (v8backend PRIVATE PUERTS_NAMESPACE=puerts)
-        target_compile_definitions (v8backend PRIVATE MULT_BACKENDS)
-        target_compile_definitions (v8backend PRIVATE V8_BACKEND)
-        target_compile_definitions (v8backend PRIVATE WITH_V8)
-        set_target_properties(v8backend PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        target_link_libraries(puerts v8backend )
-        target_compile_definitions (puerts PRIVATE MULT_BACKEND_V8)
-        if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
-            target_compile_definitions (v8backend PUBLIC WITH_IL2CPP_OPTIMIZATION)
-        endif()
-        if ( WITH_WEBSOCKET EQUAL 2 )
-            target_include_directories(v8backend PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
-            target_link_libraries(v8backend PRIVATE wolfssl)
-        endif()
-        if ( WITH_WEBSOCKET EQUAL 3 )
-            target_link_libraries(v8backend PRIVATE OpenSSL::SSL OpenSSL::Crypto)
-        endif()
-    endif ()
-    # -------------------end v8 backend-------------------------
-    
-    # -------------------begin qjs backend-------------------------
-    if ( USING_QJS)
-        set(qjsbackend_src 
-            Src/BackendEnv.cpp
-            Src/JSEngine.cpp
-            Src/JSFunction.cpp
-            ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
-            Src/PluginImpl.cpp
-            ${PUERTS_BACKEND_SRC}
-            ${BEACKEND_QUICKJS_SRC}
-        )
-        if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
-            list(APPEND BEACKEND_QUICKJS_INC ${PROJECT_SOURCE_DIR}/papi-quickjs/include)
-            list(APPEND qjsbackend_src
-               papi-quickjs/source/CppObjectMapperQuickjs.cpp
-               papi-quickjs/source/PapiQuickjsImpl.cpp
-            )
-        endif()
-        
-        add_library(qjsbackend STATIC ${qjsbackend_src})
-        target_include_directories (qjsbackend PRIVATE ${BEACKEND_QUICKJS_INC})
-        target_compile_definitions (qjsbackend PRIVATE PUERTS_NAMESPACE=puerts_qjs)
-        target_compile_definitions (qjsbackend PRIVATE MULT_BACKENDS)
-        target_compile_definitions (qjsbackend PRIVATE QJS_BACKEND)
-        target_compile_definitions (qjsbackend PRIVATE WITH_QUICKJS)
-        target_compile_definitions (qjsbackend PRIVATE WITHOUT_INSPECTOR)
-        if (USING_QJS_SUFFIX)
-            target_compile_definitions (qjsbackend PRIVATE USING_QJS_SUFFIX)
-            target_compile_definitions (qjsbackend PRIVATE CUSTOMV8NAMESPACE=v8_qjs)
+            if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
+                list(APPEND v8backend_src
+                   Src/CppObjectMapper.cpp
+                   Src/DataTransfer.cpp
+                   Src/PesapiAddonLoad.cpp
+                   Src/PesapiV8Impl.cpp
+                )
+            endif()
+            add_library(v8backend STATIC ${v8backend_src})
+            target_include_directories (v8backend PRIVATE "${BACKEND_ROOT}/Inc/v8")
+            target_compile_definitions (v8backend PRIVATE PUERTS_NAMESPACE=puerts)
+            target_compile_definitions (v8backend PRIVATE MULT_BACKENDS)
+            target_compile_definitions (v8backend PRIVATE V8_BACKEND)
+            target_compile_definitions (v8backend PRIVATE WITH_V8)
+            set_target_properties(v8backend PROPERTIES POSITION_INDEPENDENT_CODE ON)
+            target_link_libraries(puerts v8backend )
+            target_compile_definitions (puerts PRIVATE MULT_BACKEND_V8)
+            if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
+                target_compile_definitions (v8backend PUBLIC WITH_IL2CPP_OPTIMIZATION)
+            endif()
+            if ( WITH_WEBSOCKET EQUAL 2 )
+                target_include_directories(v8backend PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+                target_link_libraries(v8backend PRIVATE wolfssl)
+            endif()
+            if ( WITH_WEBSOCKET EQUAL 3 )
+                target_link_libraries(v8backend PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+            endif()
         endif ()
-        set_target_properties(qjsbackend PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        target_link_libraries(puerts qjsbackend )
-        target_compile_definitions (puerts PRIVATE MULT_BACKEND_QJS)
-        if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
-            target_compile_definitions (qjsbackend PUBLIC WITH_IL2CPP_OPTIMIZATION)
+        # -------------------end v8 backend-------------------------
+        
+        # -------------------begin qjs backend-------------------------
+        if ( USING_QJS)
+            set(qjsbackend_src 
+                Src/BackendEnv.cpp
+                Src/JSEngine.cpp
+                Src/JSFunction.cpp
+                ${PROJECT_SOURCE_DIR}/../../unreal/Puerts/Source/JsEnv/Private/V8InspectorImpl.cpp
+                Src/PluginImpl.cpp
+                ${PUERTS_BACKEND_SRC}
+                ${BEACKEND_QUICKJS_SRC}
+            )
+            if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
+                list(APPEND BEACKEND_QUICKJS_INC ${PROJECT_SOURCE_DIR}/papi-quickjs/include)
+                list(APPEND qjsbackend_src
+                   papi-quickjs/source/CppObjectMapperQuickjs.cpp
+                   papi-quickjs/source/PapiQuickjsImpl.cpp
+                )
+            endif()
+            
+            add_library(qjsbackend STATIC ${qjsbackend_src})
+            target_include_directories (qjsbackend PRIVATE ${BEACKEND_QUICKJS_INC})
+            target_compile_definitions (qjsbackend PRIVATE PUERTS_NAMESPACE=puerts_qjs)
+            target_compile_definitions (qjsbackend PRIVATE MULT_BACKENDS)
+            target_compile_definitions (qjsbackend PRIVATE QJS_BACKEND)
+            target_compile_definitions (qjsbackend PRIVATE WITH_QUICKJS)
+            target_compile_definitions (qjsbackend PRIVATE WITHOUT_INSPECTOR)
+            if (USING_QJS_SUFFIX)
+                target_compile_definitions (qjsbackend PRIVATE USING_QJS_SUFFIX)
+                target_compile_definitions (qjsbackend PRIVATE CUSTOMV8NAMESPACE=v8_qjs)
+            endif ()
+            set_target_properties(qjsbackend PROPERTIES POSITION_INDEPENDENT_CODE ON)
+            target_link_libraries(puerts qjsbackend )
+            target_compile_definitions (puerts PRIVATE MULT_BACKEND_QJS)
+            if (NOT WITHOUT_IL2CPP_OPTIMIZATION)
+                target_compile_definitions (qjsbackend PUBLIC WITH_IL2CPP_OPTIMIZATION)
+            endif()
+            if ( WITH_WEBSOCKET EQUAL 2 )
+                target_include_directories(qjsbackend PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+                target_link_libraries(qjsbackend PRIVATE wolfssl)
+            endif()
+            if ( WITH_WEBSOCKET EQUAL 3 )
+                target_link_libraries(qjsbackend PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+            endif()
+        endif ()
+        # -------------------end qjs backend-------------------------
+    else()
+        # For iOS mult backend, set compile definitions directly on puerts
+        if ( USING_V8 )
+            target_include_directories (puerts PRIVATE "${BACKEND_ROOT}/Inc/v8")
+            target_compile_definitions (puerts PRIVATE PUERTS_NAMESPACE=puerts)
+            target_compile_definitions (puerts PRIVATE MULT_BACKENDS)
+            target_compile_definitions (puerts PRIVATE V8_BACKEND)
+            target_compile_definitions (puerts PRIVATE WITH_V8)
+            target_compile_definitions (puerts PRIVATE MULT_BACKEND_V8)
         endif()
-        if ( WITH_WEBSOCKET EQUAL 2 )
-            target_include_directories(qjsbackend PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
-            target_link_libraries(qjsbackend PRIVATE wolfssl)
+        if ( USING_QJS )
+            target_include_directories (puerts PRIVATE ${BEACKEND_QUICKJS_INC})
+            target_compile_definitions (puerts PRIVATE PUERTS_NAMESPACE=puerts_qjs)
+            target_compile_definitions (puerts PRIVATE MULT_BACKENDS)
+            target_compile_definitions (puerts PRIVATE QJS_BACKEND)
+            target_compile_definitions (puerts PRIVATE WITH_QUICKJS)
+            target_compile_definitions (puerts PRIVATE WITHOUT_INSPECTOR)
+            target_compile_definitions (puerts PRIVATE MULT_BACKEND_QJS)
+            if (USING_QJS_SUFFIX)
+                target_compile_definitions (puerts PRIVATE USING_QJS_SUFFIX)
+                target_compile_definitions (puerts PRIVATE CUSTOMV8NAMESPACE=v8_qjs)
+            endif ()
         endif()
-        if ( WITH_WEBSOCKET EQUAL 3 )
-            target_link_libraries(qjsbackend PRIVATE OpenSSL::SSL OpenSSL::Crypto)
-        endif()
-    endif ()
-    # -------------------end qjs backend-------------------------
+    endif()
 endif ()
 
 # list(APPEND PUERTS_COMPILE_DEFINITIONS THREAD_SAFE)

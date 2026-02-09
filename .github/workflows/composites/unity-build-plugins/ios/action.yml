@@ -31,6 +31,40 @@ runs:
         npm i
         cd ${{ inputs.build_proj_dir }}
         node ../cli make --platform ios --backend ${{ inputs.backend }} --config ${{ inputs.config }} --websocket ${{ inputs.websocket }}
+    - name: Post-Build Processing
+      shell: bash
+      run: |
+        echo "=== iOS Post-Build Processing ==="
+        PLUGINS_DIR="./unity/Assets/core/upm/Plugins/iOS"
+        
+        if [ -d "$PLUGINS_DIR" ]; then
+          cd "$PLUGINS_DIR"
+          
+          # Clean up unnecessary .meta files (keep only those with corresponding .a files)
+          echo "Cleaning up unnecessary .meta files..."
+          REMOVED_COUNT=0
+          for meta_file in *.meta; do
+            if [ -f "$meta_file" ]; then
+              lib_file="${meta_file%.meta}"
+              if [ ! -f "$lib_file" ]; then
+                echo "  Removing: $meta_file (no corresponding library)"
+                rm -f "$meta_file"
+                ((REMOVED_COUNT++))
+              fi
+            fi
+          done
+          echo "✓ Removed $REMOVED_COUNT unnecessary .meta files"
+          
+          # Summary
+          echo ""
+          echo "Final libraries:"
+          ls -lh *.a 2>/dev/null || echo "No .a files found"
+          echo ""
+          echo "Final .meta files:"
+          ls -1 *.meta 2>/dev/null || echo "No .meta files found"
+        else
+          echo "Warning: $PLUGINS_DIR not found"
+        fi
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
