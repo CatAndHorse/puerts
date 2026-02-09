@@ -76,20 +76,6 @@ jobs:
           backend: ${{ github.event.inputs.backend }}
           websocket: ${{ github.event.inputs.websocket }}
           
-      - name: List Build Output
-        shell: bash
-        run: |
-          echo "=== Build Output ==="
-          ls -lh unity/Assets/core/upm/Plugins/iOS/ || echo "iOS plugins directory not found"
-          
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Unity_Plugins_${{ github.event.inputs.backend }}_${{ github.event.inputs.config }}_iOS
-          path: |
-            unity/Assets/core/upm/Plugins/iOS/**
-          retention-days: 30
-          
       - name: Build Summary
         shell: bash
         run: |

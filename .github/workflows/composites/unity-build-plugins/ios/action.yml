@@ -34,7 +34,7 @@ runs:
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        path: ./unity/Assets/core/upm/Plugins/**/*
+        path: ./unity/Assets/core/upm/Plugins/iOS/**/*
         name: Unity_Plugins_${{ inputs.backend }}_${{ inputs.config }}_ios
     - name: Clean
       shell: bash
