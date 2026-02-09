@@ -236,3 +236,90 @@ node ../cli make --platform ios --backend mult --config Release --websocket 2
 1. 触发GitHub Actions验证iOS构建
 2. 如果成功，关闭相关issue
 3. 更新项目文档，记录mult后端的构建要求
+
+# iOS Mult Backend Workflow Fix
+
+## 问题描述
+
+在GitHub Actions的iOS构建workflow中，使用`mult`后端时构建失败，错误信息：
+
+```
+backend: mult, backend url not found, download skiped
+❌ FATAL: Backend directory not found!
+```
+
+## 问题原因
+
+1. **mult后端的特殊性**：
+   - `mult`后端不是预编译的后端，而是在编译时动态组合v8和quickjs
+   - 它不需要从远程下载预编译的二进制文件
+   - 源代码已经包含在项目中（`backend-quickjs`目录）
+
+2. **Workflow配置问题**：
+   - "Download Backend"步骤的条件只排除了`quickjs`：
+     ```yaml
+     if: github.event.inputs.backend != 'quickjs'
+     ```
+   - 但没有排除`mult`，导致尝试下载不存在的mult后端
+   - 下载失败后，验证步骤检测不到`.backends/mult`目录，构建中止
+
+## 解决方案
+
+修改`.github/workflows/unity_build_ios.yml`中的"Download Backend"步骤条件：
+
+```yaml
+# 修改前
+if: github.event.inputs.backend != 'quickjs'
+
+# 修改后
+if: github.event.inputs.backend != 'quickjs' && github.event.inputs.backend != 'mult'
+```
+
+## 技术细节
+
+### 不需要下载的后端类型
+
+以下后端类型不需要下载预编译文件：
+
+1. **quickjs**：源代码在`backend-quickjs`目录
+2. **mult**：组合后端，使用项目中的源代码
+
+### 需要下载的后端类型
+
+以下后端需要从远程下载预编译的二进制文件：
+
+1. **v8_9.4**：V8 9.4版本
+2. **v8_10.6.194**：V8 10.6.194版本
+3. **nodejs_16**：Node.js 16版本
+
+## 修复提交
+
+- **Commit**: `8276607`
+- **Branch**: `unity-2.2.x`
+- **Date**: 2026-02-09
+- **Message**: "fix: Skip backend download for mult backend in iOS workflow"
+
+## 验证步骤
+
+修复后，重新触发iOS构建workflow：
+
+1. 进入GitHub Actions页面
+2. 选择"Build iOS Plugins"workflow
+3. 点击"Run workflow"
+4. 配置参数：
+   - Backend: `mult`
+   - WebSocket: `2` (WolfSSL)
+   - Config: `Release`
+5. 运行并验证构建成功
+
+## 相关文件
+
+- `.github/workflows/unity_build_ios.yml` - iOS构建workflow
+- `unity/native_src/CMakeLists.txt` - CMake构建配置
+- `backend-quickjs/` - QuickJS源代码目录
+
+## 注意事项
+
+1. mult后端在编译时会同时编译v8和quickjs两个后端
+2. 确保CMakeLists.txt中正确配置了QuickJS源文件
+3. iOS构建需要macOS环境（GitHub Actions使用macos-14）
