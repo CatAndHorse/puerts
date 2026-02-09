@@ -49,7 +49,7 @@ jobs:
           npm install
           
       - name: Download Backend
-        if: github.event.inputs.backend != 'quickjs'
+        if: github.event.inputs.backend != 'quickjs' && github.event.inputs.backend != 'mult'
         shell: bash
         run: |
           set -e
