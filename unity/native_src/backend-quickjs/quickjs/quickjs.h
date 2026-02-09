@@ -1102,7 +1102,8 @@ JS_EXTERN const uint16_t *JS_ToCString16Len(JSContext *ctx, JSValue val1, uint16
 
 /*-------end fuctions for v8 api---------*/
 
-#undef JS_EXTERN
+/* Keep JS_EXTERN defined for functions in quickjs.c that need it */
+/* #undef JS_EXTERN */
 
 #ifdef __cplusplus
 } /* extern "C" { */
