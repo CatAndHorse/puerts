@@ -460,9 +460,27 @@ if ( WITH_WEBSOCKET EQUAL 2 )
     
     target_compile_definitions(wolfssl PUBLIC WOLFSSL_OPENSSLEXTRA WOLFSSL_OPENSSLALL OPENSSL_EXTRA OPENSSL_ALL HAVE_EX_DATA WOLFSSL_OPENSSH)
     
-    target_link_libraries(puerts wolfssl)
-    
-    target_include_directories(puerts PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+    # For iOS: wolfssl is built as OBJECT library, link object files directly
+    if ( IOS )
+        # Get wolfssl object files and add them to puerts
+        target_sources(puerts PRIVATE $<TARGET_OBJECTS:wolfssl>)
+        # Still need to include wolfssl headers
+        target_include_directories(puerts PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+    else()
+        # For other platforms: link wolfssl as normal static/shared library
+        target_link_libraries(puerts wolfssl)
+        target_include_directories(puerts PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+        
+        # Copy wolfssl library for static builds on non-iOS platforms
+        get_target_property(target_type puerts TYPE)
+        if (target_type STREQUAL "STATIC_LIBRARY" AND NOT BUILD_SHARED_LIBS)
+            add_custom_command(TARGET puerts POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:wolfssl>"
+                "$<TARGET_FILE_DIR:puerts>/$<TARGET_FILE_NAME:wolfssl>"
+                COMMENT "copy wolfssl to output directory")
+        endif()
+    endif()
 
     list(APPEND PUERTS_COMPILE_DEFINITIONS WITH_WEBSOCKET_SSL OPENSSL_EXTRA OPENSSL_ALL WOLFSSL_OPENSSH PUERTS_USE_WOLFSSL)
     
@@ -470,25 +488,6 @@ if ( WITH_WEBSOCKET EQUAL 2 )
 	    set_property(TARGET wolfssl PROPERTY
              MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     endif ()
-
-    get_target_property(target_type puerts TYPE)
-    if (target_type STREQUAL "STATIC_LIBRARY" AND NOT BUILD_SHARED_LIBS)
-        add_custom_command(TARGET puerts POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:wolfssl>"
-            "$<TARGET_FILE_DIR:puerts>/$<TARGET_FILE_NAME:wolfssl>"
-            COMMENT "copy wolfssl to output directory")
-    endif()
-    
-    # For iOS, also copy wolfssl to the Unity plugin directory
-    if ( IOS )
-        add_custom_command(TARGET puerts POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E echo "Copying wolfssl for iOS..."
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:wolfssl>"
-            "${PROJECT_SOURCE_DIR}/../Assets/core/upm/Plugins/iOS/$<TARGET_FILE_NAME:wolfssl>"
-            COMMENT "copy wolfssl to iOS plugin directory")
-    endif()
 endif ()
 
 if ( USING_MULT_BACKEND )

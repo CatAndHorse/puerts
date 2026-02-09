@@ -63,14 +63,23 @@ runs:
           echo "Final .meta files:"
           ls -1 *.meta 2>/dev/null || echo "No .meta files found"
           
-          # Check if wolfssl library exists
-          if [ -f "libwolfssl.a" ]; then
-            echo ""
-            echo "✓ WolfSSL library found (required for WebSocket SSL support)"
-          else
-            echo ""
-            echo "⚠ Warning: libwolfssl.a not found. WebSocket SSL may not work."
-          fi
+          # Check library contents
+          echo ""
+          echo "Library information:"
+          for lib in *.a; do
+            if [ -f "$lib" ]; then
+              echo "  $lib:"
+              echo "    Size: $(du -h "$lib" | cut -f1)"
+              # Check if wolfssl symbols are present in libpuerts.a
+              if [ "$lib" = "libpuerts.a" ]; then
+                if nm "$lib" 2>/dev/null | grep -q "wolfSSL"; then
+                  echo "    ✓ Contains WolfSSL symbols (merged)"
+                else
+                  echo "    ⚠ No WolfSSL symbols found"
+                fi
+              fi
+            fi
+          done
         else
           echo "Warning: $PLUGINS_DIR not found"
         fi

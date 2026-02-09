@@ -40,7 +40,7 @@ Undefined symbols for architecture arm64:
 
 ---
 
-### 3. iOS v8单backend模式WolfSSL链接错误（✅ 已修复）
+### 3. iOS v8单backend模式WolfSSL链接错误（✅ 已修复 - 方案升级）
 
 **问题描述**：
 ```
@@ -57,11 +57,37 @@ Undefined symbols for architecture arm64:
 - `libpuerts.a`依赖`libwolfssl.a`，但iOS静态库不会自动包含依赖库的符号
 - Unity链接时只链接了`libpuerts.a`，没有链接`libwolfssl.a`
 
-**解决方案**（✅ 已实施）：
-- 修改CMakeLists.txt：iOS构建时自动将`libwolfssl.a`复制到Unity插件目录
-- 修改iOS构建后处理：验证wolfssl库是否存在
-- Unity链接时会同时链接`libpuerts.a`和`libwolfssl.a`
-- Commit: 16dff8b
+**解决方案演进**：
+
+#### 方案1（已废弃）：单独提供libwolfssl.a
+- 将`libwolfssl.a`复制到Unity插件目录
+- Unity链接时同时链接`libpuerts.a`和`libwolfssl.a`
+- **缺点**：增加了库文件数量，不够优雅
+
+#### 方案2（✅ 当前方案）：合并WolfSSL到libpuerts.a
+- 使用CMake的`$<TARGET_OBJECTS:wolfssl>`将wolfssl的目标文件添加到puerts
+- WolfSSL的所有符号直接包含在`libpuerts.a`中
+- Unity只需链接`libpuerts.a`即可
+- **优点**：
+  - ✅ 减少库文件数量
+  - ✅ 简化Unity项目配置
+  - ✅ 避免静态库依赖传递问题
+  - ✅ 更符合iOS静态库最佳实践
+
+**实施细节**：
+```cmake
+# For iOS: merge wolfssl object files into libpuerts.a
+if ( IOS )
+    target_sources(puerts PRIVATE $<TARGET_OBJECTS:wolfssl>)
+    target_include_directories(puerts PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+else()
+    # For other platforms: link wolfssl as separate library
+    target_link_libraries(puerts wolfssl)
+    target_include_directories(puerts PRIVATE ${wolfssl_SOURCE_DIR}/wolfssl)
+endif()
+```
+
+- Commit: 7139090
 
 ---
 
@@ -71,16 +97,16 @@ Undefined symbols for architecture arm64:
 
 ```
 总大小：~47MB
-实际库文件（mult backend: 4个 → 3个，v8 backend: 2个 → 3个）：
-- libpuerts.a       ~16MB   # 主库（mult backend包含v8backend + qjsbackend）
-- libwee8.a         31.0MB  # Wee8（轻量级V8）
-- libwolfssl.a      ~1.5MB  # WolfSSL（WebSocket SSL支持）
+实际库文件（mult backend: 4个 → 2个，v8 backend: 2个 → 2个）：
+- libpuerts.a       ~17.5MB  # 主库（mult backend包含v8backend + qjsbackend + wolfssl）
+                              # 或 v8 backend包含puerts + wolfssl
+- libwee8.a         31.0MB   # Wee8（轻量级V8）
 
-.meta文件（19个 → 3个）：
+.meta文件（19个 → 2个）：
 - 已清理没有对应.a文件的.meta文件
 ```
 
-### 已实施方案：A + B-1（自动合并）+ WolfSSL导出
+### 已实施方案：A + B-1（自动合并）+ WolfSSL合并
 
 #### ✅ 方案A：清理多余的.meta文件
 
@@ -90,7 +116,7 @@ Undefined symbols for architecture arm64:
 - Commit: 72de726
 
 **效果**：
-- 从19个.meta文件减少到3个
+- 从19个.meta文件减少到2个
 - 产出物更清晰，没有多余文件
 
 ---
@@ -116,26 +142,25 @@ libwee8.a        31.0MB
 
 修复后：
 ```
-libpuerts.a      ~16MB   # 包含puerts + v8backend + qjsbackend
-libwee8.a         31MB   # V8引擎
-libwolfssl.a     ~1.5MB  # WolfSSL（新增）
-+ 3个.meta文件
-总计：~48.5MB，3个库文件 + 3个.meta
+libpuerts.a      ~17.5MB  # 包含puerts + v8backend + qjsbackend + wolfssl
+libwee8.a         31MB    # V8引擎
++ 2个.meta文件
+总计：~48.5MB，2个库文件 + 2个.meta
 ```
 
 ---
 
-#### ✅ WolfSSL库导出（v8/quickjs单backend）
+#### ✅ WolfSSL合并到libpuerts.a（所有backend模式）
 
 **问题**：
-- v8单backend模式下，`libpuerts.a`依赖`libwolfssl.a`
 - iOS静态库不会自动包含依赖库的符号
-- Unity链接时找不到WolfSSL符号
+- 单独提供libwolfssl.a会增加库文件数量
 
 **实施**：
-- 修改CMakeLists.txt：iOS构建时自动将`libwolfssl.a`复制到Unity插件目录
-- 修改iOS构建后处理：验证wolfssl库是否存在
-- Commit: 16dff8b
+- 修改CMakeLists.txt：iOS构建时使用`$<TARGET_OBJECTS:wolfssl>`将wolfssl目标文件合并到libpuerts.a
+- WolfSSL的所有符号直接包含在libpuerts.a中
+- 其他平台保持原有的链接方式（单独的libwolfssl库）
+- Commit: 7139090
 
 **产出物对比（v8 backend）**：
 
@@ -150,19 +175,20 @@ libwee8.a         31MB
 
 修复后：
 ```
-libpuerts.a       ~5MB   # 包含WebSocketImpl
+libpuerts.a      ~6.5MB  # 包含puerts + wolfssl（合并）
 libwee8.a         31MB
-libwolfssl.a     ~1.5MB  # WolfSSL（新增，解决链接问题）
-+ 3个.meta文件
-总计：~37.5MB，3个库文件 + 3个.meta
-✅ 链接正常
++ 2个.meta文件
+总计：~37.5MB，2个库文件 + 2个.meta
+✅ 链接正常，WolfSSL符号已包含
 ```
 
 **优点**：
 - ✅ 解决了v8单backend模式的WolfSSL链接错误
 - ✅ 解决了mult backend模式的静态库链接错误
 - ✅ 清理了多余的.meta文件
+- ✅ 减少库文件数量（不需要单独的libwolfssl.a）
 - ✅ 简化Unity项目配置
+- ✅ 符合iOS静态库最佳实践
 - ✅ 所有backend模式都能正常工作
 
 ---
