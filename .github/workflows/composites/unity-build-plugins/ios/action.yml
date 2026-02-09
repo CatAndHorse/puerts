@@ -62,6 +62,15 @@ runs:
           echo ""
           echo "Final .meta files:"
           ls -1 *.meta 2>/dev/null || echo "No .meta files found"
+          
+          # Check if wolfssl library exists
+          if [ -f "libwolfssl.a" ]; then
+            echo ""
+            echo "✓ WolfSSL library found (required for WebSocket SSL support)"
+          else
+            echo ""
+            echo "⚠ Warning: libwolfssl.a not found. WebSocket SSL may not work."
+          fi
         else
           echo "Warning: $PLUGINS_DIR not found"
         fi

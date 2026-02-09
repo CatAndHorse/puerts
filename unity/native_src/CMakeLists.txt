@@ -479,6 +479,16 @@ if ( WITH_WEBSOCKET EQUAL 2 )
             "$<TARGET_FILE_DIR:puerts>/$<TARGET_FILE_NAME:wolfssl>"
             COMMENT "copy wolfssl to output directory")
     endif()
+    
+    # For iOS, also copy wolfssl to the Unity plugin directory
+    if ( IOS )
+        add_custom_command(TARGET puerts POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E echo "Copying wolfssl for iOS..."
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:wolfssl>"
+            "${PROJECT_SOURCE_DIR}/../Assets/core/upm/Plugins/iOS/$<TARGET_FILE_NAME:wolfssl>"
+            COMMENT "copy wolfssl to iOS plugin directory")
+    endif()
 endif ()
 
 if ( USING_MULT_BACKEND )
